@@ -1,7 +1,9 @@
 import {defineStore} from 'pinia';
 
 export const useAppStore = defineStore('app', {
-    state: () => ({}),
+    state: () => ({
+        app_name: 'Gamearound',
+    }),
     getters: {},
     actions: {},
 });

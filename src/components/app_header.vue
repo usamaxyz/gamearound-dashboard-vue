@@ -1,25 +1,37 @@
 <template>
-  <div class="container">
-    <header
-        class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-between py-3 mb-5">
-      <div class="col-lg-3 mb-2 mb-lg-0">
-        <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-          <img src="@/assets/images/logo.svg" alt="balloptix">
-        </a>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img src="@/assets/images/logo.svg" alt="logo" width="24" height="24" class="d-inline-block align-text-top">
+        {{ appStore.app_name }}
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <router-link :to="{name: 'home'}" class="nav-link">Home</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link :to="{name: 'about'}" class="nav-link link-secondary px-4">About</router-link>
+          </li>
+        </ul>
+        <button class="btn btn-outline-primary">CTA</button>
       </div>
-      <ul class="nav col-12 col-lg-auto mb-2 justify-content-center mb-lg-0">
-        <li><router-link :to="{name: 'home'}" class="nav-link link-secondary px-4">Home</router-link></li>
-        <li><router-link :to="{name: 'about'}" class="nav-link link-secondary px-4">About Us</router-link></li>
-        <li><router-link :to="{name: 'classes'}" class="nav-link link-secondary px-4">Classes</router-link></li>
-        <li><router-link :to="{name: 'pricing'}" class="nav-link link-secondary px-4">Pricing</router-link></li>
-      </ul>
-      <div class="col-lg-3 text-end">
-        <button type="button" class="btn btn-primary rounded-pill px-4">Try Beta</button>
-      </div>
-    </header>
-  </div>
+    </div>
+  </nav>
 </template>
 
 <script>
-export default {}
+import {useAppStore} from "@/stores/app.js";
+
+export default {
+  setup(){
+    const appStore = useAppStore();
+    return {
+      appStore,
+    };
+  },
+}
 </script>
