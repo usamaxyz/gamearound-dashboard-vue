@@ -1,0 +1,8 @@
+// Import your custom variables first (for Bootstrap overrides)
+@import './custom/variables';
+
+// Import Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+// Import your custom styles after Bootstrap
+@import './custom/styles';
