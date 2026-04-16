@@ -1,4 +1,74 @@
-use images
-<img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-in sass
-background-image: url('@/assets/images/hero.png');
+we have gamearound platform which is a platform for games backend logic.
+we will build a dashboard app for this platform.
+I will manually create a user, once logged in to this dashboard, he can add new games, users... and manage them according app permissions. these users are let's say an organization. I can create another user to be as another organization. I mean each organization is completely separated in terms of games, users...
+
+These are some suggestion from AI:
+1- make the app using vue3 spa with router and pinia store.
+2- host the app in AWS Amplify auto deploy from git.
+3- Enable Authentication: Use Amplify Auth (Cognito). Amazon Cognito User Pool is the industry-standard for user management.
+3.1- Authentication: The user enters their username/password in your Vue app. This goes to Amazon Cognito (AWS's service for managing users). Using the Amplify Authenticator component, you can add a professional login screen to your Vue3 app in about 10 lines of code. It handles the entire "handshake" with Cognito for you.
+3.2- The Token: If the login is successful, Cognito sends back a JWT (JSON Web Token) to the browser.
+3.3- The Request: When the user wants to "List Items," your Vue app sends that JWT in the header of the request to your API Gateway.
+3.4- The Gatekeeper: API Gateway checks the token. If it's valid and hasn't expired, it allows the request through to your Lambda.
+3.5-Database Access: The Lambda function uses its own IAM Role (internal permissions) to talk to DynamoDB.
+4- Amplify Auth library. It makes retrieving these attributes very simple:
+5- Lock the UI: Surround your Vue routes with an Authenticator component so only you can see the dashboard.
+6- API Gateway + Lambda to execute backend logic and access DynamoDB.
+7- store users in a Cognito User Pool.
+7.1- Cognito handles password resets, Multi-Factor Authentication (MFA), and session management automatically. You can then link a "Cognito User ID" to a record in your DynamoDB Users table if you need to store extra game-specific metadata.
+8- Amazon Cognito User Pool is the industry-standard choice for user management, but to handle "Organizations" and "Permissions" properly, you need to use a specific architecture pattern:
+8.1- In Cognito User Pool, create a custom attribute called custom:organization_id. We have to create the group first!
+8.2- When an admin creates a user for "Company A", they set custom:organization_id to COMPANY_A.
+8.3- This ID is "baked" into the user's JWT token. When they call your API, your Lambda function looks at the token, sees COMPANY_A, and only returns data where the TenantID matches.
+8.4- for app permissions: Store a JSON object or a record in a DynamoDB table linked to the user's Cognito sub (ID).
+Example Record: { userId: "123", orgId: "COMPANY_A", permissions: ["user:list", "user:update"] }
+Why? This allows your "Organization Admin" to toggle a checkbox in your Vue app, which updates a DynamoDB record instantly without you having to touch Cognito settings.
+9- to let a user see their own organization's users but not others:
+9.1- The Lambda reads the custom:organization_id from the login token.
+9.2- check app permissions "user:list"
+9.3- To List Users: The Lambda calls the Cognito ListUsers API using a Filter: Attributes.custom:organization_id = "ADMIN_ORG_ID".
+10- so we well go with Cognito. Use custom:organization_id for the "Org" and a DynamoDB table for the "App Permissions." This gives you the perfect balance of security (Cognito) and flexibility (DynamoDB).
+
+
+
+Is Cognito the right choice?
+Feature             Cognito Capability
+Org Isolation       Excellent via Custom Attributes (custom:org_id).
+Admin Delegation    Good. You write a "Proxy Lambda" that uses the AWS SDK to create users.
+Scalability         Excellent. It handles millions of users and organizations easily.
+Security            Excellent. It handles the password hashing, MFA, and salt automatically.
+
+to ask:
+1
+since Amplify variables don't always "automatically" appear in your Vue code unless you tell Amplify to write them into a .env file during the build, then how they are used without wrtiting them to .env? what are the use cases?
+
+
+gemini:
+https://gemini.google.com/app/1acc9c32f68f25da
+
+deepseek:
+https://chat.deepseek.com/a/chat/s/f3ad1478-9283-4678-bfeb-a55b35e0ffd3
+
+
+
+
+i created:
+gadash_users table:
+Partition key: userId as string
+gsi: companyIdIndex: Partition key: companyId as string and Sort key: createdAt as string
+
+gadash_companies table:
+Partition key: companyId as string
+
+
+gadash - 6dzjq9 user pool with company_id custom attribute with max 36 chars
+User pool ID: eu-central-1_bT03Gs2dg
+
+
+usama@gamearound.com
+Aa12345678@
+
+permissions needed:
+cognito-idp:AdminCreateUser
+cognito-idp:AdminSetUserPassword
+cognito-idp:AdminGetUser
