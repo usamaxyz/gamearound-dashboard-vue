@@ -1,8 +1,27 @@
-// Import your custom variables first (for Bootstrap overrides)
-@import './custom/variables';
+/* 
+   Gamearound Dashboard - Main Styling
+   Foundation for the Premium "Wow" Aesthetic
+*/
 
-// Import Bootstrap
-@import 'bootstrap/scss/bootstrap';
+// Design System Tokens (CSS Variables)
+@import './design-system';
 
-// Import your custom styles after Bootstrap
-@import './custom/styles';
+// Layout & Core
+@import './layout';
+
+// Specific Component Styles
+@import './components';
+
+// Global Reset & Base
+:root {
+  color-scheme: dark;
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

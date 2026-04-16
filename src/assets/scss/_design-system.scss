@@ -1,0 +1,46 @@
+:root {
+  /* Color Palette - Deep & Premium */
+  --bg-deep: #0f172a;       /* Slate 900 */
+  --bg-surface: #1e293b;    /* Slate 800 */
+  --bg-glass: rgba(30, 41, 59, 0.7);
+  
+  --primary: #38bdf8;       /* Sky 400 */
+  --primary-glow: rgba(56, 189, 248, 0.3);
+  
+  --accent: #818cf8;        /* Indigo 400 */
+  
+  --text-main: #f1f5f9;     /* Slate 100 */
+  --text-muted: #94a3b8;    /* Slate 400 */
+  
+  --border: rgba(255, 255, 255, 0.1);
+  --border-focus: rgba(56, 189, 248, 0.5);
+
+  /* Effects */
+  --glass-blur: blur(12px);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  
+  /* Layout */
+  --sidebar-width: 260px;
+  --topbar-height: 70px;
+  --radius-md: 12px;
+}
+
+@mixin glass {
+  background: var(--bg-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+}
+
+@mixin premium-card {
+  @include glass;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+    border-color: var(--border-focus);
+  }
+}
