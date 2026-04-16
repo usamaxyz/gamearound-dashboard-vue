@@ -86,6 +86,7 @@ export const handler = async (event) => {
                 userId: userId,
                 companyId: companyId,
                 email: userEmail,
+                permissions: ["super_admin"],
                 createdAt: createdAt,
                 updatedAt: createdAt,
                 status: "ACTIVE"
