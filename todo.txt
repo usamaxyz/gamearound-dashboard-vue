@@ -63,7 +63,7 @@ Partition key: companyId as string
 
 gadash - 6dzjq9 user pool with company_id custom attribute with max 36 chars
 User pool ID: eu-central-1_bT03Gs2dg
-
+client_id: 1rmn4uh4tmuaqhijaifq1pk98l
 
 usama@gamearound.com
 Aa12345678@

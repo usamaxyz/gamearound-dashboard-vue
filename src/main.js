@@ -1,5 +1,7 @@
 import './assets/scss/main.scss';
+import './services/amplify-config';
 import {createApp} from 'vue';
+
 import {createPinia} from 'pinia';
 
 import App from './App.vue';

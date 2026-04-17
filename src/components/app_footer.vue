@@ -1,28 +1,69 @@
 <template>
-  <div class="container">
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top"><p
-        class="col-md-4 mb-0 text-body-secondary">© 2026 Gamearound, Inc</p>
-
-<!--      <router-link :to="{name: 'home'}"-->
-<!--                   class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">-->
-<!--        <img src="@/assets/images/logo.svg" alt="logo" width="40" height="32" class="d-inline-block align-text-top">-->
-<!--      </router-link>-->
-      <div
-          class="col-md-4 d-flex align-items-center justify-content-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
-        <img src="@/assets/images/logo.svg" alt="logo" width="40" height="40" class="d-inline-block align-text-top">
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-left">
+        <p class="copyright">© 2026 Gamearound, Inc. All rights reserved.</p>
       </div>
-      <ul class="nav col-md-4 justify-content-end">
-        <li class="nav-item">
-          <router-link :to="{name: 'home'}" class="nav-link px-2 text-body-secondary">Home</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link :to="{name: 'about'}" class="nav-link px-2 text-body-secondary">About</router-link>
-        </li>
-      </ul>
-    </footer>
-  </div>
+      
+      <div class="footer-center">
+        <img src="@/assets/images/logo.svg" alt="logo" class="footer-logo">
+      </div>
+      
+      <div class="footer-right">
+        <ul class="footer-nav">
+          <li><router-link :to="{name: 'home'}">Home</router-link></li>
+          <li><router-link :to="{name: 'about'}">About</router-link></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
 </template>
 
-<script>
-export default {}
+<script setup>
 </script>
+
+<style lang="scss" scoped>
+.app-footer {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.copyright {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.footer-logo {
+  width: 32px;
+  height: 32px;
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.footer-nav {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+
+  a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--text-main);
+    }
+  }
+}
+</style>
