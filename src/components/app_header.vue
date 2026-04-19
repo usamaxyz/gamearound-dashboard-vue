@@ -62,38 +62,3 @@ const handleLogout = async () => {
     router.push({ name: 'login' });
 };
 </script>
-
-<style lang="scss" scoped>
-.topbar {
-    height: var(--topbar-height);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--space-6);
-    @include glass;
-    border-top: none; border-left: none; border-right: none;
-    z-index: var(--z-sticky);
-    position: sticky; top: 0;
-}
-
-.topbar-left { display: flex; align-items: center; gap: var(--space-6); }
-.page-title { font-size: 1.125rem; font-weight: 700; color: var(--text-main); margin: 0; letter-spacing: -0.5px; }
-
-.topbar-right { display: flex; align-items: center; }
-.user-actions { display: flex; align-items: center; gap: var(--space-6); }
-.divider { width: 1px; height: 24px; background: var(--border); }
-
-.user-menu { display: flex; align-items: center; gap: var(--space-6); }
-.user-info {
-    display: flex; flex-direction: column; align-items: flex-end;
-    .user-name { font-size: 0.875rem; font-weight: 600; color: var(--text-main); }
-    .company-tag { font-size: 0.75rem; color: var(--text-muted); }
-}
-
-.logout-btn { width: 36px; height: 36px; padding: 0; }
-.login-btn { padding: 0.625rem 1.25rem; text-decoration: none; }
-
-@media (max-width: 768px) {
-    .user-info { display: none; }
-}
-</style>

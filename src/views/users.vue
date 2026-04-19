@@ -132,61 +132,63 @@
     </div>
 
     <!-- Modals -->
-    <div v-if="showAddModal || editingUser" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <div class="header-content">
-            <h2>{{ editingUser ? 'Edit User' : 'Add New User' }}</h2>
-            <p v-if="!editingUser">Fill in the details to add a new team member.</p>
-          </div>
-          <button @click="closeModal" class="btn-ghost"><X :size="20" /></button>
-        </div>
-        
-        <form @submit.prevent="saveUser">
-          <div class="form-group">
-            <label>Full Name</label>
-            <div class="input-wrapper has-icon">
-              <User :size="18" class="input-icon" />
-              <input v-model="form.name" type="text" required />
+    <Teleport to="body">
+      <div v-if="showAddModal || editingUser" class="modal-overlay" @click.self="closeModal">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="header-content">
+              <h2>{{ editingUser ? 'Edit User' : 'Add New User' }}</h2>
+              <p v-if="!editingUser">Fill in the details to add a new team member.</p>
             </div>
+            <button @click="closeModal" class="btn-ghost"><X :size="20" /></button>
           </div>
           
-          <div class="form-group">
-            <label>Email Address</label>
-            <div class="input-wrapper has-icon">
-              <Mail :size="18" class="input-icon" />
-              <input v-model="form.email" type="email" :disabled="!!editingUser" required />
-            </div>
-            <p v-if="editingUser" class="input-hint">Email address cannot be changed.</p>
-          </div>
-          
-          <div class="form-group">
-            <label>Access Permissions</label>
-            <div class="pill-selection-grid">
-              <div 
-                v-for="role in availablePermissions" 
-                :key="role" 
-                class="selection-pill"
-                :class="{ 'active': form.permissions.includes(role) }"
-                @click="togglePermission(role)"
-              >
-                <component :is="getRoleIcon(role)" :size="16" />
-                <span>{{ role }}</span>
-                <Check v-if="form.permissions.includes(role)" :size="14" />
+          <form @submit.prevent="saveUser">
+            <div class="form-group">
+              <label>Full Name</label>
+              <div class="input-wrapper has-icon">
+                <User :size="18" class="input-icon" />
+                <input v-model="form.name" type="text" required />
               </div>
             </div>
-          </div>
-          
-          <div class="modal-actions">
-            <button type="button" @click="closeModal" class="btn-secondary">Discard</button>
-            <button type="submit" class="btn-primary" :disabled="formLoading">
-              <span v-if="!formLoading">{{ editingUser ? 'Update User' : 'Send Invite' }}</span>
-              <RefreshCw v-else class="spinning" :size="18" />
-            </button>
-          </div>
-        </form>
+            
+            <div class="form-group">
+              <label>Email Address</label>
+              <div class="input-wrapper has-icon">
+                <Mail :size="18" class="input-icon" />
+                <input v-model="form.email" type="email" :disabled="!!editingUser" required />
+              </div>
+              <p v-if="editingUser" class="input-hint">Email address cannot be changed.</p>
+            </div>
+            
+            <div class="form-group">
+              <label>Access Permissions</label>
+              <div class="pill-selection-grid">
+                <div 
+                  v-for="role in availablePermissions" 
+                  :key="role" 
+                  class="selection-pill"
+                  :class="{ 'active': form.permissions.includes(role) }"
+                  @click="togglePermission(role)"
+                >
+                  <component :is="getRoleIcon(role)" :size="16" />
+                  <span>{{ role }}</span>
+                  <Check v-if="form.permissions.includes(role)" :size="14" />
+                </div>
+              </div>
+            </div>
+            
+            <div class="modal-actions">
+              <button type="button" @click="closeModal" class="btn-secondary">Discard</button>
+              <button type="submit" class="btn-primary" :disabled="formLoading">
+                <span v-if="!formLoading">{{ editingUser ? 'Update User' : 'Send Invite' }}</span>
+                <RefreshCw v-else class="spinning" :size="18" />
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
@@ -307,84 +309,4 @@ const saveUser = async () => {
 onMounted(fetchUsers);
 </script>
 
-<style lang="scss" scoped>
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-8);
 
-  h1 {
-    font-size: 1.875rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin: 0;
-  }
-  p { color: var(--text-muted); margin: var(--space-1) 0 0; }
-}
-
-.filters-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-4);
-  gap: var(--space-4);
-
-  .search-wrapper {
-    position: relative;
-    flex: 1;
-    max-width: 400px;
-    .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-    input {
-      width: 100%;
-      padding: 0.75rem 1rem 0.75rem 3rem;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-main);
-      &:focus { outline: none; border-color: var(--primary); }
-    }
-  }
-}
-
-.user-row-info {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  .avatar {
-    width: 40px; height: 40px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
-    border-radius: 50%; @include flex-center; font-weight: 700; color: #000;
-  }
-  .details {
-    display: flex; flex-direction: column;
-    .name { font-weight: 600; color: var(--text-main); }
-    .email { font-size: 0.8125rem; color: var(--text-muted); }
-  }
-}
-
-.badge-group { display: flex; gap: var(--space-2); }
-.date-text { font-size: 0.875rem; color: var(--text-muted); }
-
-.row-actions {
-  display: flex; gap: var(--space-2); justify-content: flex-end;
-  .btn-ghost {
-    &:hover.edit { color: var(--primary); border-color: var(--primary); }
-    &:hover.delete { color: var(--danger); border-color: var(--danger); }
-  }
-}
-
-.pill-selection-grid {
-  display: flex; flex-wrap: wrap; gap: var(--space-3);
-  .selection-pill {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 0.6rem 1rem; background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border); border-radius: 100px;
-    cursor: pointer; transition: all var(--transition-fast);
-    font-size: 0.875rem; color: var(--text-muted);
-    
-    &:hover { background: rgba(255,255,255,0.06); border-color: var(--border-bright); color: var(--text-main); }
-    &.active { background: rgba(56, 189, 248, 0.1); border-color: var(--primary); color: var(--text-main); }
-  }
-}
-</style>

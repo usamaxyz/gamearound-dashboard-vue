@@ -20,18 +20,3 @@
 <script setup>
 import { Ghost } from 'lucide-vue-next';
 </script>
-
-<style lang="scss" scoped>
-.not-found-page {
-  height: 80vh;
-  @include flex-center;
-}
-
-.error-code {
-  font-size: 6rem;
-  font-weight: 900;
-  margin: 0;
-  @include text-gradient;
-  line-height: 1;
-}
-</style>

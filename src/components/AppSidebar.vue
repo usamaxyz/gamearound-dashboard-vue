@@ -143,30 +143,4 @@ const isChildActive = (children) => {
   </aside>
 </template>
 
-<style lang="scss" scoped>
-.app-version {
-  font-size: 0.6875rem;
-  color: var(--text-dim);
-  text-align: center;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
 
-.nav-children {
-  margin-top: 0.25rem;
-  padding-left: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.child-link {
-  padding: 0.6rem 1rem;
-  font-size: 0.875rem;
-  
-  &.active::before {
-    left: -1.25rem;
-  }
-}
-</style>

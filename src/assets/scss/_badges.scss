@@ -1,0 +1,59 @@
+/* Badges & Status */
+
+.badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid transparent;
+
+  &.active, &.success { 
+    background: rgba(16, 185, 129, 0.1); 
+    color: var(--success);
+    border-color: rgba(16, 185, 129, 0.2);
+  }
+  &.primary, &.admin { 
+    background: rgba(56, 189, 248, 0.1); 
+    color: var(--primary);
+    border-color: rgba(56, 189, 248, 0.2);
+  }
+  &.accent, &.developer { 
+    background: rgba(129, 140, 248, 0.1); 
+    color: var(--accent);
+    border-color: rgba(129, 140, 248, 0.2);
+  }
+  &.danger { 
+    background: rgba(239, 68, 68, 0.1); 
+    color: var(--danger);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+}
+
+.status-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  &.active {
+    color: var(--success);
+    &::before { background: var(--success); box-shadow: 0 0 8px var(--success); }
+  }
+
+  &.inactive {
+    color: var(--text-muted);
+    &::before { background: var(--text-muted); }
+  }
+}

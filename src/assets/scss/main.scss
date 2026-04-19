@@ -6,28 +6,21 @@
 // Design System Tokens (CSS Variables)
 @import './design-system';
 
-// Layout & Core
-@import './layout';
+// Base Reset & Typography
+@import './base';
 
 // Specific Component Styles
-@import './components';
+@import './animations';
+@import './buttons';
+@import './forms';
+@import './modals';
+@import './tables';
+@import './cards';
+@import './badges';
 @import './sidebar';
+
+// Layout & Core (Imported late to allow component-specific overrides)
 @import './layout';
 
-// Global Reset & Base
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-:root {
-  color-scheme: dark;
-}
-
-body {
-    margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-deep);
-    color: var(--text-main);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
+// Page-Specific Layouts
+@import './pages';

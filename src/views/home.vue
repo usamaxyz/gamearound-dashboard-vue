@@ -1,5 +1,5 @@
 <template>
-  <div class="home-page">
+  <div class="home-page fadeIn">
     <div class="page-header">
       <div class="header-content">
         <h1>Welcome back, {{ authStore.name }}</h1>
@@ -60,9 +60,3 @@ import { Gamepad2, TrendingUp, Activity, Layout } from 'lucide-vue-next';
 
 const authStore = useAuthStore();
 </script>
-
-<style lang="scss" scoped>
-.home-page {
-  animation: fadeIn 0.4s ease-out;
-}
-</style>

@@ -33,7 +33,3 @@ onMounted(async () => {
     await authStore.checkAuth();
 });
 </script>
-
-<style lang="scss">
-// App Global Styles - Layout is handled by _layout.scss
-</style>

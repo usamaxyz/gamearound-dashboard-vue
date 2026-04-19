@@ -1,0 +1,60 @@
+/* Data Tables */
+
+.table-wrapper {
+  @include premium-card;
+  background: var(--bg-surface);
+  overflow: hidden;
+  margin-top: var(--space-6);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+
+  th {
+    padding: var(--space-4) var(--space-6);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: var(--space-4) var(--space-6);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-main);
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background: rgba(255, 255, 255, 0.01);
+  }
+}
+
+.empty-state {
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+  color: var(--text-muted);
+  @include flex-center;
+  flex-direction: column;
+  
+  .empty-icon {
+    margin-bottom: var(--space-6);
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+  
+  h3 {
+    color: var(--text-main);
+    margin-bottom: var(--space-2);
+    font-size: 1.25rem;
+  }
+}

@@ -1,0 +1,97 @@
+/* Forms & Inputs */
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label, .form-label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 0.9375rem;
+    transition: all var(--transition-fast);
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: rgba(15, 23, 42, 0.6);
+      box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(15, 23, 42, 0.2);
+    }
+  }
+
+  &.has-icon {
+    input, textarea, select {
+      padding-left: 2.75rem;
+    }
+  }
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 0.5rem;
+}
+
+// Custom Pill Selection (from Users view)
+.pill-selection-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  
+  .selection-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border-bright);
+      color: var(--text-main);
+    }
+    
+    &.active {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+  }
+}
