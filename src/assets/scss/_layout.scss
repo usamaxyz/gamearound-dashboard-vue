@@ -50,6 +50,24 @@
   overflow: hidden;
 }
 
+/* Page Headers */
+.page-header {
+  @include flex-between;
+  margin-bottom: var(--space-8);
+
+  .header-content {
+    @include flex-column;
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0;
+    }
+    p { color: var(--text-muted); margin: var(--space-1) 0 0; }
+  }
+}
+
+
 @media (max-width: 1024px) {
   .main-content {
     padding-left: 0 !important;

@@ -112,3 +112,25 @@
 @mixin premium-glow {
   box-shadow: 0 0 20px var(--primary-glow);
 }
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin avatar($size: 40px) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  @include flex-center;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  font-weight: 700;
+  color: #000;
+}
+

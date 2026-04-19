@@ -58,3 +58,34 @@
     font-size: 1.25rem;
   }
 }
+
+/* User Specific Rows */
+.user-row-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  
+  .avatar {
+    @include avatar(40px);
+  }
+  
+  .details {
+    @include flex-column;
+    .name { font-weight: 600; color: var(--text-main); }
+    .email { font-size: 0.8125rem; color: var(--text-muted); }
+  }
+}
+
+.badge-group { display: flex; gap: var(--space-2); }
+.date-text { font-size: 0.875rem; color: var(--text-muted); }
+
+.row-actions {
+  display: flex; gap: var(--space-2); justify-content: flex-end;
+  .btn-ghost {
+    padding: 0.5rem;
+    border-radius: 8px;
+    &:hover.edit { color: var(--primary); border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+    &:hover.delete { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+  }
+}
+
