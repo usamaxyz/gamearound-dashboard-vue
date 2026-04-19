@@ -3,7 +3,7 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, QueryCommand, PutCommand, UpdateCommand, DeleteCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const region = "eu-central-1";
-const userPoolId = "eu-central-1_bT03Gs2dg";
+const userPoolId = "eu-central-1_BIxQEi7ju";
 
 const cognitoClient = new CognitoIdentityProviderClient({ region });
 const ddbClient = new DynamoDBClient({ region });
@@ -43,6 +43,9 @@ export const handler = async (event) => {
             return await listUsers(requesterCompanyId, event.queryStringParameters);
         } 
         
+        if (method === "GET" && resource === "/profile") {
+            return await getProfile(requesterCompanyId, requesterUserId);
+        }        
         if (method === "POST" && resource === "/users") {
             return await createUser(requesterCompanyId, JSON.parse(event.body || "{}"));
         }
@@ -71,6 +74,28 @@ export const handler = async (event) => {
     }
 
 };
+
+async function getProfile(companyId, userId) {
+    const userRes = await docClient.send(new GetCommand({
+        TableName: "gadash_users",
+        Key: { userId: userId }
+    }));
+
+    const companyRes = await docClient.send(new GetCommand({
+        TableName: "gadash_companies",
+        Key: { companyId: companyId }
+    }));
+
+    return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+            user: userRes.Item,
+            company: companyRes.Item
+        })
+    };
+}
+
 
 /**
  * List users in the company with optional name filter

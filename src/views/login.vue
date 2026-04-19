@@ -2,8 +2,10 @@
   <div class="login-page">
     <div class="login-card">
       <div class="login-header">
-        <img src="@/assets/images/logo.svg" alt="logo" class="logo" />
-        <h1>Welcome Back</h1>
+        <div class="brand">
+          <div class="logo-box">G</div>
+          <span class="brand-text">GAME<span>AROUND</span></span>
+        </div>
         <p>Sign in to your Gamearound account</p>
       </div>
 
@@ -16,9 +18,9 @@
               v-model="email" 
               type="email" 
               id="email" 
-              placeholder="name@company.com" 
               required 
               :disabled="loading"
+              autofocus
             />
           </div>
         </div>
@@ -31,7 +33,6 @@
               v-model="password" 
               type="password" 
               id="password" 
-              placeholder="••••••••" 
               required
               :disabled="loading"
             />
@@ -96,7 +97,8 @@ const handleLogin = async () => {
 
 <style lang="scss" scoped>
 .login-page {
-  min-height: calc(100vh - 150px);
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,9 +106,9 @@ const handleLogin = async () => {
 }
 
 .login-card {
-  @include premium-card;
+  @include premium-modal;
   width: 100%;
-  max-width: 450px;
+  max-width: 500px;
   padding: 3rem;
   background: var(--bg-surface);
 }
@@ -115,10 +117,37 @@ const handleLogin = async () => {
   text-align: center;
   margin-bottom: 2.5rem;
 
-  .logo {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 1.5rem;
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .logo-box {
+      width: 48px;
+      height: 48px;
+      background: var(--primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      color: var(--bg-deep);
+      font-size: 1.5rem;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-text {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--primary);
+      
+      span {
+        color: var(--text-main);
+      }
+    }
   }
 
   h1 {
@@ -141,10 +170,12 @@ const handleLogin = async () => {
 
     label {
       display: block;
-      color: var(--text-main);
-      font-size: 0.875rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   }
 
@@ -156,28 +187,23 @@ const handleLogin = async () => {
     .icon {
       position: absolute;
       left: 1rem;
-      color: var(--text-muted);
+      color: var(--text-dim);
     }
 
     input {
       width: 100%;
-      padding: 0.875rem 1rem 0.875rem 3rem;
-      background: var(--bg-deep);
+      padding: 0.875rem 1rem 0.875rem 2.75rem;
+      background: rgba(15, 23, 42, 0.4);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
       color: var(--text-main);
-      font-size: 1rem;
-      transition: all 0.2s ease;
+      font-size: 0.9375rem;
+      transition: all var(--transition-fast);
 
       &:focus {
         outline: none;
         border-color: var(--primary);
         box-shadow: 0 0 0 4px var(--primary-glow);
-      }
-
-      &::placeholder {
-        color: var(--text-muted);
-        opacity: 0.5;
       }
     }
   }
@@ -189,7 +215,7 @@ const handleLogin = async () => {
   background: rgba(239, 44, 44, 0.1);
   border: 1px solid rgba(239, 44, 44, 0.2);
   border-radius: var(--radius-md);
-  color: #ef4444;
+  color: var(--danger);
   font-size: 0.875rem;
   display: flex;
   align-items: center;
@@ -213,7 +239,7 @@ const handleLogin = async () => {
   transition: all 0.2s ease;
 
   &:hover:not(:disabled) {
-    background: #7dd3fc;
+    background: var(--primary-deep);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px var(--primary-glow);
   }

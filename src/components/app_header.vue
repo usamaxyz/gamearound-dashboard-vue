@@ -22,8 +22,8 @@
         
         <div class="user-menu">
           <div class="user-info">
-            <span class="user-name">{{ authStore.email }}</span>
-            <span class="company-tag">{{ authStore.companyId ? 'ID: ' + authStore.companyId.slice(0, 8) : 'Admin' }}</span>
+            <span class="user-name">{{ authStore.name }}</span>
+            <span class="company-tag">{{ authStore.companyName }}</span>
           </div>
           <button @click="handleLogout" class="logout-btn" title="Logout">
             <LogOut :size="18" />

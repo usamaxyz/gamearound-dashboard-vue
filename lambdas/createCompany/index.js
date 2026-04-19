@@ -4,7 +4,7 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 
 const region = "eu-central-1";
-const userPoolId = "eu-central-1_bT03Gs2dg";
+const userPoolId = "eu-central-1_BIxQEi7ju";
 
 const cognitoClient = new CognitoIdentityProviderClient({ region });
 const ddbClient = new DynamoDBClient({ region });
@@ -21,6 +21,7 @@ export const handler = async (event) => {
     console.log("CreateCompany Event:", JSON.stringify(event, null, 2));
 
     const companyName = "Gamearound";
+    const userName = "Usama";
     const userEmail = "usama@gamearound.com";
     const password = "Aa12345678@";
 
@@ -86,6 +87,7 @@ export const handler = async (event) => {
                 userId: userId,
                 companyId: companyId,
                 email: userEmail,
+                name: userName,
                 permissions: ["admin"],
                 createdAt: createdAt,
                 updatedAt: createdAt,

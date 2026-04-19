@@ -20,11 +20,6 @@ export default [
         meta: { auth: true }
     },
     {
-        path: '/about',
-        name: 'about',
-        component: () => import('../views/about.vue'),
-    },
-    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../views/not_found.vue'),

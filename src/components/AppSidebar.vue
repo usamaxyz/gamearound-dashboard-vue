@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAuthStore } from "@/stores/auth";
+import { useAppStore } from "@/stores/app";
 import { 
   LayoutDashboard, 
   Users, 
@@ -20,6 +21,7 @@ const props = defineProps({
 
 const route = useRoute();
 const authStore = useAuthStore();
+const appStore = useAppStore();
 
 const navigation = [
   { 
@@ -40,13 +42,6 @@ const navigation = [
     to: '/games', 
     icon: Gamepad2 
   },
-  {
-    name: 'Support',
-    icon: Info,
-    children: [
-      { name: 'About', to: { name: 'about' }, icon: Info },
-    ]
-  }
 ];
 
 // Keep track of which groups are expanded
@@ -130,14 +125,19 @@ const isChildActive = (children) => {
     </nav>
 
     <div class="sidebar-footer">
-      <div class="user-profile">
+      <div v-if="isOpen" class="user-profile">
         <div class="avatar">
-          {{ authStore.email?.charAt(0).toUpperCase() || 'U' }}
+          {{ authStore.name.charAt(0).toUpperCase() }}
         </div>
-        <div v-if="isOpen" class="user-details">
-          <p class="user-name">{{ authStore.email?.split('@')[0] }}</p>
-          <p class="user-role">{{ authStore.companyId ? 'Client' : 'Administrator' }}</p>
+        <div class="user-details">
+          <p class="user-name">{{ authStore.name }}</p>
+          <p class="company-name">{{ authStore.companyName }}</p>
+          <p class="user-email">{{ authStore.email }}</p>
         </div>
+      </div>
+      
+      <div v-if="isOpen" class="app-version">
+        Version {{ appStore.version }}
       </div>
     </div>
   </aside>
@@ -309,47 +309,72 @@ const isChildActive = (children) => {
 }
 
 .sidebar-footer {
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .user-profile {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: var(--radius-md);
+  padding: 0.25rem;
   
   .avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     @include flex-center;
     font-weight: 700;
     color: var(--bg-deep);
     flex-shrink: 0;
+    box-shadow: 0 4px 12px var(--primary-glow);
   }
   
   .user-details {
     overflow: hidden;
     
     .user-name {
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 0.9375rem;
+      font-weight: 700;
       color: var(--text-main);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
-    .user-role {
+
+    .company-name {
       font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0.125rem 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .user-email {
+      font-size: 0.6875rem;
       color: var(--text-muted);
       margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
+}
+
+.app-version {
+  font-size: 0.6875rem;
+  color: var(--text-dim);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 </style>
