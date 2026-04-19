@@ -125,7 +125,7 @@ const isChildActive = (children) => {
     </nav>
 
     <div class="sidebar-footer">
-      <div v-if="isOpen" class="user-profile">
+      <div v-if="isOpen" class="sidebar-user-profile">
         <div class="avatar">
           {{ authStore.name.charAt(0).toUpperCase() }}
         </div>
@@ -144,151 +144,13 @@ const isChildActive = (children) => {
 </template>
 
 <style lang="scss" scoped>
-.sidebar {
-  width: var(--sidebar-width);
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  @include glass;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  transition: width var(--transition-normal);
-  z-index: 100;
-  overflow: hidden;
-
-  &.collapsed {
-    width: var(--sidebar-collapsed-width);
-    
-    .nav-link {
-      justify-content: center;
-      padding: 0.8rem 0;
-      
-      .icon {
-        margin-right: 0;
-      }
-    }
-  }
-}
-
-.sidebar-header {
-  height: var(--topbar-height);
-  display: flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  border-bottom: 1px solid var(--border);
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  
-  .logo-box {
-    width: 32px;
-    height: 32px;
-    background: var(--primary);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 900;
-    color: var(--bg-deep);
-    font-size: 1.2rem;
-    box-shadow: 0 0 15px var(--primary-glow);
-  }
-  
-  .brand-text {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--primary);
-    
-    span {
-      color: var(--text-main);
-    }
-  }
-}
-
-.sidebar-nav {
-  flex: 1;
-  padding: 1.5rem 0.75rem;
-  overflow-y: auto;
-  
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 10px;
-  }
-}
-
-.nav-group {
-  margin-bottom: 0.5rem;
-}
-
-.nav-link {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  color: var(--text-muted);
-  text-decoration: none;
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
-  cursor: pointer;
-  position: relative;
-  
-  .icon {
-    margin-right: 0.875rem;
-    transition: color var(--transition-fast);
-  }
-  
-  .link-text {
-    font-size: 0.9375rem;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  
-  .chevron {
-    margin-left: auto;
-    opacity: 0.5;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--text-main);
-  }
-  
-  &.active {
-    background: rgba(56, 189, 248, 0.1);
-    color: var(--primary);
-    font-weight: 600;
-    
-    .icon {
-      color: var(--primary);
-    }
-
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 25%;
-      height: 50%;
-      width: 3px;
-      background: var(--primary);
-      border-radius: 0 4px 4px 0;
-      box-shadow: 0 0 10px var(--primary-glow);
-    }
-  }
-}
-
-.group-header {
-  &.group-active {
-    color: var(--text-main);
-    .icon { color: var(--accent); }
-  }
+.app-version {
+  font-size: 0.6875rem;
+  color: var(--text-dim);
+  text-align: center;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .nav-children {
@@ -306,75 +168,5 @@ const isChildActive = (children) => {
   &.active::before {
     left: -1.25rem;
   }
-}
-
-.sidebar-footer {
-  padding: 1.25rem 1rem;
-  border-top: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.25rem;
-  
-  .avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    @include flex-center;
-    font-weight: 700;
-    color: var(--bg-deep);
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px var(--primary-glow);
-  }
-  
-  .user-details {
-    overflow: hidden;
-    
-    .user-name {
-      font-size: 0.9375rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .company-name {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--primary);
-      margin: 0.125rem 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    
-    .user-email {
-      font-size: 0.6875rem;
-      color: var(--text-muted);
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-}
-
-.app-version {
-  font-size: 0.6875rem;
-  color: var(--text-dim);
-  text-align: center;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
 }
 </style>
