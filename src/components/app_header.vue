@@ -1,26 +1,34 @@
 <template>
   <nav class="topbar">
     <div class="topbar-left">
-      <router-link :to="{name: 'home'}" class="brand">
-        <img src="@/assets/images/logo.svg" alt="logo" class="logo">
-        <span class="brand-name">{{ appStore.app_name }}</span>
-      </router-link>
-      
-      <div v-if="authStore.isAuthenticated" class="nav-links">
-        <router-link :to="{name: 'home'}" class="nav-link">Dashboard</router-link>
-        <router-link :to="{name: 'users'}" class="nav-link">Users</router-link>
+      <button 
+        v-if="authStore.isAuthenticated" 
+        @click="$emit('toggle-sidebar')" 
+        class="menu-toggle"
+      >
+        <Menu :size="20" />
+      </button>
+
+      <div class="page-info">
+        <h1 class="page-title">{{ currentPageName }}</h1>
       </div>
     </div>
 
     <div class="topbar-right">
-      <div v-if="authStore.isAuthenticated" class="user-menu">
-        <div class="user-info">
-          <span class="user-name">{{ authStore.email }}</span>
-          <span class="company-tag">{{ authStore.companyId ? 'ID: ' + authStore.companyId.slice(0, 8) : 'Admin' }}</span>
+      <div v-if="authStore.isAuthenticated" class="user-actions">
+        <!-- Notifications or Search could go here -->
+        
+        <div class="divider"></div>
+        
+        <div class="user-menu">
+          <div class="user-info">
+            <span class="user-name">{{ authStore.email }}</span>
+            <span class="company-tag">{{ authStore.companyId ? 'ID: ' + authStore.companyId.slice(0, 8) : 'Admin' }}</span>
+          </div>
+          <button @click="handleLogout" class="logout-btn" title="Logout">
+            <LogOut :size="18" />
+          </button>
         </div>
-        <button @click="handleLogout" class="logout-btn" title="Logout">
-          <LogOut :size="20" />
-        </button>
       </div>
       <div v-else>
         <router-link :to="{name: 'login'}" class="btn-login">Sign In</router-link>
@@ -30,14 +38,23 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAppStore } from "@/stores/app.js";
 import { useAuthStore } from "@/stores/auth.js";
-import { LogOut } from 'lucide-vue-next';
+import { LogOut, Menu } from 'lucide-vue-next';
 
 const router = useRouter();
+const route = useRoute();
 const appStore = useAppStore();
 const authStore = useAuthStore();
+
+defineEmits(['toggle-sidebar']);
+
+const currentPageName = computed(() => {
+    const name = route.name?.toString() || 'Dashboard';
+    return name.charAt(0).toUpperCase() + name.slice(1);
+});
 
 const handleLogout = async () => {
     await authStore.logout();
@@ -51,7 +68,7 @@ const handleLogout = async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
     @include glass;
     border-top: none;
     border-left: none;
@@ -59,48 +76,39 @@ const handleLogout = async () => {
     z-index: 50;
     position: sticky;
     top: 0;
+    transition: all var(--transition-normal);
 }
 
 .topbar-left {
     display: flex;
     align-items: center;
-    gap: 3rem;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-decoration: none;
-    
-    .logo {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .brand-name {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: var(--text-main);
-        letter-spacing: -0.5px;
-    }
-}
-
-.nav-links {
-    display: flex;
     gap: 1.5rem;
+}
+
+.menu-toggle {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
     
-    .nav-link {
-        color: var(--text-muted);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.9375rem;
-        transition: color 0.2s ease;
-        
-        &:hover, &.router-link-active {
-            color: var(--primary);
-        }
+    &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+        border-color: var(--border-bright);
     }
+}
+
+.page-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .topbar-right {
@@ -108,12 +116,22 @@ const handleLogout = async () => {
     align-items: center;
 }
 
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.divider {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+}
+
 .user-menu {
     display: flex;
     align-items: center;
     gap: 1.5rem;
-    padding-left: 1.5rem;
-    border-left: 1px solid var(--border);
 }
 
 .user-info {
@@ -134,21 +152,21 @@ const handleLogout = async () => {
 }
 
 .logout-btn {
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
+    width: 36px;
+    height: 36px;
+    @include flex-center;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 8px;
-    color: var(--text-muted);
+    color: var(--danger);
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    transition: all var(--transition-fast);
 
     &:hover {
-        color: #ef4444;
-        border-color: #ef4444;
-        background: rgba(239, 68, 68, 0.1);
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+        box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
     }
 }
 
@@ -160,12 +178,18 @@ const handleLogout = async () => {
     border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 0.875rem;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
     
     &:hover {
-        background: #7dd3fc;
+        background: var(--primary-deep);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px var(--primary-glow);
+    }
+}
+
+@media (max-width: 768px) {
+    .user-info {
+        display: none;
     }
 }
 </style>

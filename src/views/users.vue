@@ -14,21 +14,27 @@
     <!-- Stats Section -->
     <div class="stats-grid">
       <div class="stat-card">
-        <Users class="icon purple" :size="24" />
+        <div class="icon-box purple">
+          <Users :size="32" />
+        </div>
         <div class="stat-info">
           <span class="label">Total Users</span>
           <span class="value">{{ users.length }}</span>
         </div>
       </div>
       <div class="stat-card">
-        <ShieldCheck class="icon blue" :size="24" />
+        <div class="icon-box blue">
+          <ShieldCheck :size="32" />
+        </div>
         <div class="stat-info">
           <span class="label">Admins</span>
           <span class="value">{{ adminCount }}</span>
         </div>
       </div>
       <div class="stat-card">
-        <UserCheck class="icon green" :size="24" />
+        <div class="icon-box green">
+          <UserCheck :size="32" />
+        </div>
         <div class="stat-info">
           <span class="label">Active Sessions</span>
           <span class="value">{{ activeCount }}</span>
@@ -43,7 +49,7 @@
         <input 
           v-model="searchQuery" 
           type="text" 
-          placeholder="Search items..." 
+          placeholder="Search users..." 
           @input="handleSearch"
         />
       </div>
@@ -130,35 +136,57 @@
     <div v-if="showAddModal || editingUser" class="modal-overlay" @click.self="closeModal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2>{{ editingUser ? 'Edit User' : 'Add New User' }}</h2>
-          <button @click="closeModal" class="close-btn"><X :size="24" /></button>
+          <div class="header-content">
+            <h2>{{ editingUser ? 'Edit User' : 'Add New User' }}</h2>
+            <p v-if="!editingUser">Fill in the details to add a new team member.</p>
+          </div>
+          <button @click="closeModal" class="close-btn"><X :size="20" /></button>
         </div>
         
         <form @submit.prevent="saveUser" class="modal-form">
           <div class="form-group">
             <label>Full Name</label>
-            <input v-model="form.name" type="text" placeholder="John Doe" required />
+            <div class="input-wrapper">
+              <User :size="18" class="input-icon" />
+              <input v-model="form.name" type="text" required />
+            </div>
           </div>
           
           <div class="form-group">
             <label>Email Address</label>
-            <input v-model="form.email" type="email" placeholder="john@company.com" :disabled="!!editingUser" required />
+            <div class="input-wrapper">
+              <Mail :size="18" class="input-icon" />
+              <input v-model="form.email" type="email" :disabled="!!editingUser" required />
+            </div>
+            <p v-if="editingUser" class="input-hint">Email address cannot be changed after account creation.</p>
           </div>
           
-          <div class="form-group">
-            <label>Permissions</label>
-            <div class="permissions-grid">
-              <label v-for="role in availablePermissions" :key="role" class="checkbox-label">
-                <input type="checkbox" :value="role" v-model="form.permissions" />
-                <span>{{ role.charAt(0).toUpperCase() + role.slice(1) }}</span>
-              </label>
+          <div class="form-group permissions-section">
+            <label>Access Permissions</label>
+            <div class="permissions-pill-grid">
+              <div 
+                v-for="role in availablePermissions" 
+                :key="role" 
+                class="permission-pill"
+                :class="{ 'active': form.permissions.includes(role) }"
+                @click="togglePermission(role)"
+              >
+                <div class="pill-icon">
+                  <component :is="getRoleIcon(role)" :size="16" />
+                </div>
+                <span class="pill-name">{{ role.charAt(0).toUpperCase() + role.slice(1) }}</span>
+                <div v-if="form.permissions.includes(role)" class="check-mark">
+                  <Check :size="12" />
+                </div>
+              </div>
             </div>
           </div>
           
           <div class="modal-actions">
-            <button type="button" @click="closeModal" class="cancel-btn">Cancel</button>
+            <button type="button" @click="closeModal" class="cancel-btn">Discard</button>
             <button type="submit" class="save-btn" :disabled="formLoading">
-              {{ formLoading ? 'Saving...' : (editingUser ? 'Save Changes' : 'Invite User') }}
+              <span v-if="!formLoading">{{ editingUser ? 'Update User' : 'Send Invite' }}</span>
+              <RefreshCw v-else class="spinning" :size="18" />
             </button>
           </div>
         </form>
@@ -168,11 +196,17 @@
     <!-- Delete Confirmation -->
     <div v-if="userToDelete" class="modal-overlay" @click.self="userToDelete = null">
       <div class="modal-card mini">
-        <h3>Delete User?</h3>
-        <p>Are you sure you want to remove <strong>{{ userToDelete.name }}</strong>? This action cannot be undone.</p>
+        <div class="warning-icon">
+          <Trash2 :size="32" />
+        </div>
+        <h3>Remove user?</h3>
+        <p>This will permanently revoke access for <strong>{{ userToDelete.name || userToDelete.email }}</strong>.</p>
         <div class="modal-actions">
-          <button @click="userToDelete = null" class="cancel-btn">Cancel</button>
-          <button @click="handleDelete" class="delete-btn" :disabled="formLoading">Delete</button>
+          <button @click="userToDelete = null" class="cancel-btn">Keep User</button>
+          <button @click="handleDelete" class="delete-btn" :disabled="formLoading">
+             <span v-if="!formLoading">Confirm Delete</span>
+             <RefreshCw v-else class="spinning" :size="18" />
+          </button>
         </div>
       </div>
     </div>
@@ -185,7 +219,8 @@ import api from '@/services/api';
 import { useAppStore } from '@/stores/app';
 import { 
   UserPlus, Users, ShieldCheck, UserCheck, Search, 
-  RefreshCw, Edit2, Trash2, X, UserX 
+  RefreshCw, Edit2, Trash2, X, UserX, User, Mail,
+  Shield, Code, Headphones, Check, Layout
 } from 'lucide-vue-next';
 
 const appStore = useAppStore();
@@ -205,6 +240,26 @@ const form = ref({
 });
 
 const availablePermissions = computed(() => appStore.permissions);
+
+const getRoleIcon = (role) => {
+  switch (role.toLowerCase()) {
+    case 'admin': return Shield;
+    case 'developer': return Code;
+    case 'support': return Headphones;
+    default: return Layout;
+  }
+};
+
+const togglePermission = (role) => {
+  const index = form.value.permissions.indexOf(role);
+  if (index > -1) {
+    if (form.value.permissions.length > 1) {
+      form.value.permissions.splice(index, 1);
+    }
+  } else {
+    form.value.permissions.push(role);
+  }
+};
 
 const adminCount = computed(() => users.value.filter(u => u.permissions.includes('admin')).length);
 const activeCount = computed(() => users.value.filter(u => u.status === 'ACTIVE').length);
@@ -250,6 +305,7 @@ const editUser = (user) => {
 const closeModal = () => {
   showAddModal.value = false;
   editingUser.value = null;
+  userToDelete.value = null;
   form.value = { name: '', email: '', permissions: ['user'] };
 };
 
@@ -331,7 +387,7 @@ onMounted(fetchUsers);
     transition: all 0.2s ease;
 
     &:hover {
-      background: #7dd3fc;
+      background: var(--primary-deep);
       transform: translateY(-2px);
       box-shadow: 0 4px 12px var(--primary-glow);
     }
@@ -352,18 +408,37 @@ onMounted(fetchUsers);
   align-items: center;
   gap: 1.25rem;
 
-  .icon {
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
+  .icon-box {
+    width: 56px;
+    height: 56px;
+    @include flex-center;
+    border-radius: 16px;
+    transition: all var(--transition-normal);
+    
+    &.purple { 
+      color: #a855f7; 
+      background: rgba(168, 85, 247, 0.1); 
+      border: 1px solid rgba(168, 85, 247, 0.15);
+    }
+    &.blue { 
+      color: #3b82f6; 
+      background: rgba(59, 130, 246, 0.1); 
+      border: 1px solid rgba(59, 130, 246, 0.15);
+    }
+    &.green { 
+      color: #10b981; 
+      background: rgba(16, 185, 129, 0.1); 
+      border: 1px solid rgba(16, 185, 129, 0.15);
+    }
 
-    &.purple { color: #a855f7; }
-    &.blue { color: #3b82f6; }
-    &.green { color: #10b981; }
+    svg {
+      flex-shrink: 0;
+    }
+  }
+
+  &:hover .icon-box {
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.05);
   }
 
   .stat-info {
@@ -569,98 +644,260 @@ onMounted(fetchUsers);
   }
 }
 
+.empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  @include flex-center;
+  
+  .empty-icon {
+    margin-bottom: 1.5rem;
+    color: var(--text-dim);
+    opacity: 0.5;
+  }
+  
+  h3 {
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+  }
+}
+
 /* Modals */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
+  animation: fadeInOverlay 0.3s ease-out;
+}
+
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-card {
-  @include premium-card;
-  background: var(--bg-surface);
+  @include premium-modal;
   width: 100%;
-  max-width: 500px;
-  padding: 2rem;
+  max-width: 540px;
+  padding: 2.5rem;
+  position: relative;
+  animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   
   &.mini {
-    max-width: 400px;
+    max-width: 420px;
     text-align: center;
-    p { color: var(--text-muted); margin-bottom: 2rem; }
+    .warning-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      @include flex-center;
+    }
+    p { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9375rem; line-height: 1.5; }
   }
 
   .modal-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+    align-items: flex-start;
+    margin-bottom: 2.5rem;
 
-    h2 { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
-    .close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+    h2 { 
+      font-size: 1.5rem; 
+      font-weight: 800; 
+      @include text-gradient;
+      margin: 0 0 0.5rem;
+    }
+    
+    p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .close-btn { 
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.05); 
+      border: 1px solid var(--border); 
+      border-radius: 8px;
+      color: var(--text-dim); 
+      cursor: pointer; 
+      @include flex-center;
+      transition: all var(--transition-fast);
+      &:hover { color: var(--text-main); border-color: var(--border-bright); }
+    }
   }
+}
+
+@keyframes modalScaleUp {
+  from { transform: scale(0.95) translateY(10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
 }
 
 .modal-form {
   .form-group {
     margin-bottom: 1.5rem;
-    label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem; }
-    input {
+    
+    label { 
+      display: block; 
+      font-size: 0.8125rem; 
+      font-weight: 700; 
+      margin-bottom: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+      position: relative;
       width: 100%;
-      padding: 0.75rem 1rem;
-      background: var(--bg-deep);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      color: var(--text-main);
-      &:focus { outline: none; border-color: var(--primary); }
+      display: block;
+      
+      .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-dim);
+        pointer-events: none;
+      }
+
+      input {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 2.75rem;
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+        font-size: 0.9375rem;
+
+        &:focus { 
+          outline: none; 
+          border-color: var(--primary); 
+          background: rgba(15, 23, 42, 0.6);
+          box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        &:disabled { opacity: 0.5; cursor: not-allowed; background: rgba(15, 23, 42, 0.2); }
+      }
+    }
+    
+    .input-hint {
+        font-size: 0.75rem;
+        color: var(--text-dim);
+        margin-top: 0.5rem;
     }
   }
 }
 
-.permissions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--bg-deep);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+.permissions-pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
+.permission-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
+  
+  .pill-icon {
+    @include flex-center;
+    color: var(--text-dim);
+    transition: color var(--transition-fast);
+  }
+  
+  .pill-name {
     font-size: 0.875rem;
+    font-weight: 600;
     color: var(--text-muted);
+  }
+  
+  .check-mark {
+    @include flex-center;
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    color: var(--bg-deep);
+    border-radius: 50%;
+  }
 
-    input { width: auto !important; cursor: pointer; }
-    &:hover { color: var(--text-main); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border-bright);
+    .pill-name { color: var(--text-main); }
+  }
+
+  &.active {
+    background: rgba(56, 189, 248, 0.1);
+    border-color: var(--primary);
+    
+    .pill-icon { color: var(--primary); }
+    .pill-name { color: var(--text-main); }
+  }
 }
 
 .modal-actions {
   display: flex;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
 
   button {
     flex: 1;
     padding: 0.875rem;
     border-radius: var(--radius-md);
     font-weight: 700;
+    font-size: 0.9375rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--transition-fast);
+    @include flex-center;
   }
 
-  .cancel-btn { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-main); }
-  .save-btn { background: var(--primary); border: none; color: #000; }
-  .delete-btn { background: #ef4444; border: none; color: #fff; }
+  .cancel-btn { 
+    background: transparent; 
+    border: 1px solid var(--border); 
+    color: var(--text-muted);
+    &:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+  }
+  
+  .save-btn { 
+    background: var(--primary); 
+    border: none; 
+    color: #000;
+    &:hover:not(:disabled) { background: var(--primary-deep); transform: translateY(-1px); box-shadow: 0 4px 12px var(--primary-glow); }
+    &:disabled { opacity: 0.5; }
+  }
+  
+  .delete-btn { 
+    background: var(--danger); 
+    border: none; 
+    color: #fff;
+    &:hover:not(:disabled) { background: #dc2626; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+  }
+
+  .spinning { animation: spin 1s linear infinite; }
 }
 
 @keyframes spin {
