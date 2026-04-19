@@ -82,7 +82,7 @@ const handleLogin = async () => {
 
     if (isSignedIn) {
       await authStore.checkAuth();
-      router.push({ name: 'home' });
+        router.push({ name: 'home' });
     } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
         error.value = 'New password required. Please reset your password.';
     }
