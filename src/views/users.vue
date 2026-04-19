@@ -192,8 +192,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, computed } from 'vue';
+<script>
 import api from '@/services/api';
 import { useAppStore } from '@/stores/app';
 import { 
@@ -202,111 +201,129 @@ import {
   Shield, Code, Headphones, Check, Layout
 } from 'lucide-vue-next';
 
-const appStore = useAppStore();
-
-const users = ref([]);
-const loading = ref(false);
-const searchQuery = ref('');
-const showAddModal = ref(false);
-const editingUser = ref(null);
-const userToDelete = ref(null);
-const formLoading = ref(false);
-
-const form = ref({
-  name: '',
-  email: '',
-  permissions: ['user']
-});
-
-const availablePermissions = computed(() => appStore.permissions);
-
-const getRoleIcon = (role) => {
-  switch (role.toLowerCase()) {
-    case 'admin': return Shield;
-    case 'developer': return Code;
-    case 'support': return Headphones;
-    default: return Layout;
-  }
-};
-
-const togglePermission = (role) => {
-  const index = form.value.permissions.indexOf(role);
-  if (index > -1) {
-    if (form.value.permissions.length > 1) {
-      form.value.permissions.splice(index, 1);
+export default {
+  name: 'UsersView',
+  components: {
+    UserPlus, Users, ShieldCheck, UserCheck, Search, 
+    RefreshCw, Edit2, Trash2, X, UserX, User, Mail,
+    Shield, Code, Headphones, Check, Layout
+  },
+  setup() {
+    const appStore = useAppStore();
+    return { appStore };
+  },
+  data() {
+    return {
+      users: [],
+      loading: false,
+      searchQuery: '',
+      showAddModal: false,
+      editingUser: null,
+      userToDelete: null,
+      formLoading: false,
+      form: {
+        name: '',
+        email: '',
+        permissions: ['user']
+      },
+      searchTimeout: null
+    };
+  },
+  computed: {
+    availablePermissions() {
+      return this.appStore.permissions;
+    },
+    adminCount() {
+      return this.users.filter(u => u.permissions.includes('admin')).length;
+    },
+    activeCount() {
+      return this.users.filter(u => u.status === 'ACTIVE').length;
     }
-  } else {
-    form.value.permissions.push(role);
-  }
-};
-
-const adminCount = computed(() => users.value.filter(u => u.permissions.includes('admin')).length);
-const activeCount = computed(() => users.value.filter(u => u.status === 'ACTIVE').length);
-
-const fetchUsers = async () => {
-  loading.value = true;
-  try {
-    const res = await api.get('/users', {
-      params: { search: searchQuery.value }
-    });
-    users.value = res.data.users || [];
-  } catch (err) {
-    console.error('Failed to fetch users:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-let searchTimeout;
-const handleSearch = () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(fetchUsers, 300);
-};
-
-const formatDate = (dateStr) => {
-  if (!dateStr) return '-';
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric'
-  });
-};
-
-const editUser = (user) => {
-  editingUser.value = user;
-  form.value = {
-    name: user.name,
-    email: user.email,
-    permissions: [...user.permissions]
-  };
-};
-
-const closeModal = () => {
-  showAddModal.value = false;
-  editingUser.value = null;
-  form.value = { name: '', email: '', permissions: ['user'] };
-};
-
-const saveUser = async () => {
-  formLoading.value = true;
-  try {
-    if (editingUser.value) {
-      await api.patch(`/users/${editingUser.value.userId}`, {
-        name: form.value.name,
-        permissions: form.value.permissions
+  },
+  methods: {
+    getRoleIcon(role) {
+      switch (role.toLowerCase()) {
+        case 'admin': return 'Shield';
+        case 'developer': return 'Code';
+        case 'support': return 'Headphones';
+        default: return 'Layout';
+      }
+    },
+    togglePermission(role) {
+      const index = this.form.permissions.indexOf(role);
+      if (index > -1) {
+        if (this.form.permissions.length > 1) {
+          this.form.permissions.splice(index, 1);
+        }
+      } else {
+        this.form.permissions.push(role);
+      }
+    },
+    async fetchUsers() {
+      this.loading = true;
+      try {
+        const res = await api.get('/users', {
+          params: { search: this.searchQuery }
+        });
+        this.users = res.data.users || [];
+      } catch (err) {
+        console.error('Failed to fetch users:', err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    handleSearch() {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(this.fetchUsers, 300);
+    },
+    formatDate(dateStr) {
+      if (!dateStr) return '-';
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric'
       });
-    } else {
-      await api.post('/users', form.value);
+    },
+    editUser(user) {
+      this.editingUser = user;
+      this.form = {
+        name: user.name,
+        email: user.email,
+        permissions: [...user.permissions]
+      };
+    },
+    closeModal() {
+      this.showAddModal = false;
+      this.editingUser = null;
+      this.form = { name: '', email: '', permissions: ['user'] };
+    },
+    confirmDelete(user) {
+        // Implement delete confirmation logic if needed
+        console.log('Confirm delete', user);
+    },
+    async saveUser() {
+      this.formLoading = true;
+      try {
+        if (this.editingUser) {
+          await api.patch(`/users/${this.editingUser.userId}`, {
+            name: this.form.name,
+            permissions: this.form.permissions
+          });
+        } else {
+          await api.post('/users', this.form);
+        }
+        await this.fetchUsers();
+        this.closeModal();
+      } catch (err) {
+        console.error('Failed to save user:', err);
+        alert(err.response?.data?.message || 'Error saving user');
+      } finally {
+        this.formLoading = false;
+      }
     }
-    await fetchUsers();
-    closeModal();
-  } catch (err) {
-    console.error('Failed to save user:', err);
-    alert(err.response?.data?.message || 'Error saving user');
-  } finally {
-    formLoading.value = false;
+  },
+  mounted() {
+    this.fetchUsers();
   }
 };
-
-onMounted(fetchUsers);
 </script>
 
 

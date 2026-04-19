@@ -1,6 +1,4 @@
-<script setup>
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+<script>
 import { useAuthStore } from "@/stores/auth";
 import { useAppStore } from "@/stores/app";
 import { 
@@ -15,54 +13,71 @@ import {
   LogOut
 } from 'lucide-vue-next';
 
-const props = defineProps({
-  isOpen: Boolean
-});
-
-const route = useRoute();
-const authStore = useAuthStore();
-const appStore = useAppStore();
-
-const navigation = [
-  { 
-    name: 'Dashboard', 
-    to: { name: 'home' }, 
-    icon: LayoutDashboard 
+export default {
+  name: 'AppSidebar',
+  components: {
+    LayoutDashboard,
+    Users,
+    Building2,
+    Settings,
+    ChevronDown,
+    ChevronRight,
+    Gamepad2,
+    Info,
+    LogOut
   },
-  {
-    name: 'Management',
-    icon: Building2,
-    children: [
-      { name: 'Users', to: { name: 'users' }, icon: Users },
-      { name: 'Companies', to: '/settings', icon: Building2 },
-    ]
+  props: {
+    isOpen: Boolean
   },
-  { 
-    name: 'Games', 
-    to: '/games', 
-    icon: Gamepad2 
+  setup() {
+    const authStore = useAuthStore();
+    const appStore = useAppStore();
+    return { authStore, appStore };
   },
-];
-
-// Keep track of which groups are expanded
-const expandedGroups = ref(['Management']);
-
-const toggleGroup = (groupName) => {
-  const index = expandedGroups.value.indexOf(groupName);
-  if (index > -1) {
-    expandedGroups.value.splice(index, 1);
-  } else {
-    expandedGroups.value.push(groupName);
+  data() {
+    return {
+      expandedGroups: ['Management'],
+      navigation: [
+        { 
+          name: 'Dashboard', 
+          to: { name: 'home' }, 
+          icon: 'LayoutDashboard' 
+        },
+        {
+          name: 'Management',
+          icon: 'Building2',
+          children: [
+            { name: 'Users', to: { name: 'users' }, icon: 'Users' },
+            { name: 'Companies', to: '/settings', icon: 'Building2' },
+          ]
+        },
+        { 
+          name: 'Games', 
+          to: '/games', 
+          icon: 'Gamepad2' 
+        },
+      ]
+    };
+  },
+  methods: {
+    toggleGroup(groupName) {
+      const index = this.expandedGroups.indexOf(groupName);
+      if (index > -1) {
+        this.expandedGroups.splice(index, 1);
+      } else {
+        this.expandedGroups.push(groupName);
+      }
+    },
+    isGroupExpanded(groupName) {
+      return this.expandedGroups.includes(groupName);
+    },
+    isChildActive(children) {
+      return children.some(child => {
+        if (typeof child.to === 'string') return this.$route.path === child.to;
+        return this.$route.name === child.to.name;
+      });
+    }
   }
-};
-
-const isGroupExpanded = (groupName) => expandedGroups.value.includes(groupName);
-
-const isChildActive = (children) => {
-  return children.some(child => {
-      if (typeof child.to === 'string') return route.path === child.to;
-      return route.name === child.to.name;
-  });
 };
 </script>
 
@@ -99,7 +114,7 @@ const isChildActive = (children) => {
             <span v-if="isOpen" class="link-text">{{ item.name }}</span>
             <component 
               v-if="isOpen"
-              :is="isGroupExpanded(item.name) ? ChevronDown : ChevronRight" 
+              :is="isGroupExpanded(item.name) ? 'ChevronDown' : 'ChevronRight'" 
               class="chevron" 
               :size="16" 
             />
@@ -127,7 +142,7 @@ const isChildActive = (children) => {
     <div class="sidebar-footer">
       <div v-if="isOpen" class="sidebar-user-profile">
         <div class="avatar">
-          {{ authStore.name.charAt(0).toUpperCase() }}
+          {{ authStore.name ? authStore.name.charAt(0).toUpperCase() : 'U' }}
         </div>
         <div class="user-details">
           <p class="user-name">{{ authStore.name }}</p>

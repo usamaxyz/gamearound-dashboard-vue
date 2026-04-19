@@ -54,9 +54,21 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { useAuthStore } from '@/stores/auth';
 import { Gamepad2, TrendingUp, Activity, Layout } from 'lucide-vue-next';
 
-const authStore = useAuthStore();
+export default {
+  name: 'HomeView',
+  components: {
+    Gamepad2,
+    TrendingUp,
+    Activity,
+    Layout
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  }
+};
 </script>

@@ -17,6 +17,13 @@
   </div>
 </template>
 
-<script setup>
+<script>
 import { Ghost } from 'lucide-vue-next';
+
+export default {
+  name: 'NotFoundView',
+  components: {
+    Ghost
+  }
+};
 </script>

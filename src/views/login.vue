@@ -55,43 +55,56 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+<script>
 import { signIn } from 'aws-amplify/auth';
 import { useAuthStore } from '@/stores/auth';
 import { Mail, Lock, AlertCircle, ArrowRight, RefreshCw } from 'lucide-vue-next';
 
-const router = useRouter();
-const authStore = useAuthStore();
+export default {
+  name: 'LoginView',
+  components: {
+    Mail,
+    Lock,
+    AlertCircle,
+    ArrowRight,
+    RefreshCw
+  },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
+  data() {
+    return {
+      email: '',
+      password: '',
+      error: '',
+      loading: false
+    };
+  },
+  methods: {
+    async handleLogin() {
+      this.loading = true;
+      this.error = '';
+      
+      try {
+        const { isSignedIn, nextStep } = await signIn({
+          username: this.email,
+          password: this.password,
+        });
 
-const email = ref('');
-const password = ref('');
-const error = ref('');
-const loading = ref(false);
-
-const handleLogin = async () => {
-  loading.value = true;
-
-  error.value = '';
-  
-  try {
-    const { isSignedIn, nextStep } = await signIn({
-      username: email.value,
-      password: password.value,
-    });
-
-    if (isSignedIn) {
-      await authStore.checkAuth();
-        router.push({ name: 'home' });
-    } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-        error.value = 'New password required. Please reset your password.';
+        if (isSignedIn) {
+          await this.authStore.checkAuth();
+          this.$router.push({ name: 'home' });
+        } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+          this.error = 'New password required. Please reset your password.';
+        }
+      } catch (err) {
+        console.error('Login error:', err);
+        this.error = err.message || 'Failed to sign in. Please check your credentials.';
+      } finally {
+        this.loading = false;
+      }
     }
-  } catch (err) {
-    console.error('Login error:', err);
-    error.value = err.message || 'Failed to sign in. Please check your credentials.';
-  } finally {
-    loading.value = false;
   }
 };
 </script>

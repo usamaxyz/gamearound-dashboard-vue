@@ -38,27 +38,34 @@
   </nav>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+<script>
 import { useAppStore } from "@/stores/app.js";
 import { useAuthStore } from "@/stores/auth.js";
 import { LogOut, Menu } from 'lucide-vue-next';
 
-const router = useRouter();
-const route = useRoute();
-const appStore = useAppStore();
-const authStore = useAuthStore();
-
-defineEmits(['toggle-sidebar']);
-
-const currentPageName = computed(() => {
-    const name = route.name?.toString() || 'Dashboard';
-    return name.charAt(0).toUpperCase() + name.slice(1);
-});
-
-const handleLogout = async () => {
-    await authStore.logout();
-    router.push({ name: 'login' });
+export default {
+  name: 'AppHeader',
+  components: {
+    LogOut,
+    Menu
+  },
+  emits: ['toggle-sidebar'],
+  setup() {
+    const authStore = useAuthStore();
+    const appStore = useAppStore();
+    return { authStore, appStore };
+  },
+  computed: {
+    currentPageName() {
+      const name = this.$route.name?.toString() || 'Dashboard';
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+  },
+  methods: {
+    async handleLogout() {
+      await this.authStore.logout();
+      this.$router.push({ name: 'login' });
+    }
+  }
 };
 </script>
