@@ -71,7 +71,7 @@
   border: 1px solid var(--border);
 }
 
-@mixin premium-card {
+@mixin premium-card($hover: true) {
   background: var(--bg-card);
   backdrop-filter: var(--glass-blur);
   border: 1px solid var(--border);
@@ -79,11 +79,13 @@
   box-shadow: var(--shadow-md);
   transition: all var(--transition-normal);
   
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--border-focus);
-    background: rgba(30, 41, 59, 0.7);
+  @if $hover {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--border-focus);
+      background: rgba(30, 41, 59, 0.7);
+    }
   }
 }
 

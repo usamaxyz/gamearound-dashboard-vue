@@ -1,7 +1,7 @@
 /* Data Tables */
 
 .table-wrapper {
-  @include premium-card;
+  @include premium-card(false);
   background: var(--bg-surface);
   overflow: hidden;
   margin-top: var(--space-6);

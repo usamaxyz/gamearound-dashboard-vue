@@ -44,7 +44,7 @@
 
 /* Data Table Container Utility */
 .content-wrapper {
-  @include premium-card;
+  @include premium-card(false);
   background: var(--bg-surface);
   margin-top: var(--space-6);
   overflow: hidden;
