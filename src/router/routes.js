@@ -17,7 +17,7 @@ export default [
         path: '/users',
         name: 'users',
         component: () => import('../views/users.vue'),
-        meta: { auth: true }
+        meta: { auth: true, permission: 'manage_users' }
     },
     {
         path: '/:pathMatch(.*)*',

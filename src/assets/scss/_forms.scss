@@ -124,11 +124,58 @@
       color: var(--text-main);
       transition: all var(--transition-fast);
       
-      &:focus { 
-        outline: none; 
-        border-color: var(--primary); 
-        box-shadow: 0 0 0 4px var(--primary-glow);
+    }
+  }
+}
+
+// --- Status Toggle Switch ---
+.status-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+
+  .toggle-track {
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 100px;
+    position: relative;
+    transition: all var(--transition-normal);
+    border: 1px solid var(--border);
+
+    .toggle-thumb {
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: all var(--transition-normal);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    &.active {
+      background: #10b981; 
+      border-color: #10b981;
+
+      .toggle-thumb {
+        left: 22px;
       }
+    }
+  }
+
+  .status-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--text-main);
+  }
+
+  &:hover {
+    .toggle-track {
+      border-color: var(--text-dim);
     }
   }
 }

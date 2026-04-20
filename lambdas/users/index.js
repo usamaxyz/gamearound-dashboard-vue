@@ -38,14 +38,34 @@ export const handler = async (event) => {
         const resource = event.resource; // e.g. /users or /users/{userId}
         const userIdParam = event.pathParameters?.userId;
 
-        // 2. Routing
+        // 2. Routing (Public routes within the app - no manage_users required)
+        if (method === "GET" && resource === "/profile") {
+            return await getProfile(requesterCompanyId, requesterUserId);
+        }
+
+        // 3. RBAC Enforcement (Restricted to manage_users)
+        const requesterRes = await docClient.send(new GetCommand({
+            TableName: "gadash_users",
+            Key: { userId: requesterUserId }
+        }));
+        
+        const requesterPermissions = requesterRes.Item?.permissions || [];
+        const canManageUsers = requesterPermissions.includes("manage_users");
+
+        if (!canManageUsers) {
+            return {
+                statusCode: 403,
+                headers: corsHeaders,
+                body: JSON.stringify({ message: "Forbidden: You do not have permission to manage users" })
+            };
+        }
+
+        // 4. Routing (Restricted routes)
         if (method === "GET" && resource === "/users") {
             return await listUsers(requesterCompanyId, event.queryStringParameters);
         }
 
-        if (method === "GET" && resource === "/profile") {
-            return await getProfile(requesterCompanyId, requesterUserId);
-        }
+        // (Profile route moved above)
         if (method === "POST" && resource === "/users") {
             return await createUser(requesterCompanyId, JSON.parse(event.body || "{}"));
         }
@@ -134,15 +154,22 @@ async function listUsers(companyId, queryParams) {
  * Create a new user in Cognito and DynamoDB
  */
 async function createUser(companyId, body) {
-    const { email, name, permissions } = body;
+    let { email, name, permissions, status } = body;
 
+    // Strict Input Validation & Whitlisting
     if (!email || !name) {
         return {
             statusCode: 400,
-            headers: corsHeaders, // Added this
+            headers: corsHeaders,
             body: JSON.stringify({ message: "Email and Name are required" })
         };
     }
+
+    // Sanitize and normalize
+    email = email.toLowerCase().trim();
+    name = name.trim();
+    permissions = Array.isArray(permissions) ? permissions : [];
+    const finalStatus = status === "INACTIVE" ? "INACTIVE" : "ACTIVE";
 
     // 1. Create in Cognito
     const cognitoRes = await cognitoClient.send(new AdminCreateUserCommand({
@@ -166,8 +193,8 @@ async function createUser(companyId, body) {
         companyId: companyId,
         email: email,
         name: name,
-        permissions: permissions || ["user"],
-        status: "ACTIVE",
+        permissions: permissions,
+        status: finalStatus,
         createdAt: createdAt,
         updatedAt: createdAt
     };
@@ -189,6 +216,7 @@ async function createUser(companyId, body) {
  * Update user (permissions, status, name)
  */
 async function updateUser(companyId, targetUserId, body) {
+    // Whitelist only allowed fields
     const { name, permissions, status } = body;
 
     // First verify user belongs to the same company

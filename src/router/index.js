@@ -40,6 +40,9 @@ router.beforeEach(async (to, from, next) => {
     } else if (to.meta.guest && isAuthenticated) {
         // Redirect to home if path is for guests only and user is authenticated
         next({ name: 'home' })
+    } else if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
+        // Redirect to home if user lacks required permission
+        next({ name: 'home' })
     } else {
         next()
     }

@@ -178,6 +178,17 @@
               </div>
             </div>
             
+            <div class="form-group" v-if="editingUser">
+              <label>Account Status</label>
+              <div class="status-toggle-wrapper" @click="form.status = form.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'">
+                <div class="toggle-track" :class="{ 'active': form.status === 'ACTIVE' }">
+                  <div class="toggle-thumb"></div>
+                </div>
+                <span class="status-label">{{ form.status === 'ACTIVE' ? 'Active' : 'Inactive' }}</span>
+              </div>
+              <p class="input-hint">Inactive users cannot log into the platform.</p>
+            </div>
+            
             <div class="modal-actions">
               <button type="button" @click="closeModal" class="btn-secondary">Discard</button>
               <button type="submit" class="btn-primary" :disabled="formLoading">
@@ -224,7 +235,8 @@ export default {
       form: {
         name: '',
         email: '',
-        permissions: ['user']
+        permissions: [],
+        status: 'ACTIVE'
       },
       searchTimeout: null
     };
@@ -244,8 +256,7 @@ export default {
     getRoleIcon(role) {
       switch (role.toLowerCase()) {
         case 'admin': return 'Shield';
-        case 'developer': return 'Code';
-        case 'support': return 'Headphones';
+        case 'manage_users': return 'Users';
         default: return 'Layout';
       }
     },
@@ -287,13 +298,14 @@ export default {
       this.form = {
         name: user.name,
         email: user.email,
-        permissions: [...user.permissions]
+        permissions: [...user.permissions],
+        status: user.status
       };
     },
     closeModal() {
       this.showAddModal = false;
       this.editingUser = null;
-      this.form = { name: '', email: '', permissions: ['user'] };
+      this.form = { name: '', email: '', permissions: [], status: 'ACTIVE' };
     },
     confirmDelete(user) {
         // Implement delete confirmation logic if needed
@@ -305,7 +317,8 @@ export default {
         if (this.editingUser) {
           await api.patch(`/users/${this.editingUser.userId}`, {
             name: this.form.name,
-            permissions: this.form.permissions
+            permissions: this.form.permissions,
+            status: this.form.status
           });
         } else {
           await api.post('/users', this.form);

@@ -36,8 +36,12 @@ export default {
   },
   data() {
     return {
-      expandedGroups: ['Management'],
-      navigation: [
+      expandedGroups: ['Management']
+    };
+  },
+  computed: {
+    filteredNavigation() {
+      return [
         { 
           name: 'Dashboard', 
           to: { name: 'home' }, 
@@ -47,17 +51,22 @@ export default {
           name: 'Management',
           icon: 'Building2',
           children: [
-            { name: 'Users', to: { name: 'users' }, icon: 'Users' },
-            { name: 'Companies', to: '/settings', icon: 'Building2' },
-          ]
+            { 
+              name: 'Users', 
+              to: { name: 'users' }, 
+              icon: 'Users',
+              show: this.authStore.hasPermission('manage_users')
+            },
+            { name: 'Companies', to: '/settings', icon: 'Building2', show: true },
+          ].filter(child => child.show !== false)
         },
         { 
           name: 'Games', 
           to: '/games', 
           icon: 'Gamepad2' 
         },
-      ]
-    };
+      ];
+    }
   },
   methods: {
     toggleGroup(groupName) {
@@ -91,7 +100,7 @@ export default {
     </div>
 
     <nav class="sidebar-nav">
-      <div v-for="item in navigation" :key="item.name" class="nav-group">
+      <div v-for="item in filteredNavigation" :key="item.name" class="nav-group">
         <!-- Single Item -->
         <router-link 
           v-if="!item.children" 
