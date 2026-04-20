@@ -41,11 +41,11 @@ export const handler = async (event) => {
         // 2. Routing
         if (method === "GET" && resource === "/users") {
             return await listUsers(requesterCompanyId, event.queryStringParameters);
-        } 
-        
+        }
+
         if (method === "GET" && resource === "/profile") {
             return await getProfile(requesterCompanyId, requesterUserId);
-        }        
+        }
         if (method === "POST" && resource === "/users") {
             return await createUser(requesterCompanyId, JSON.parse(event.body || "{}"));
         }
@@ -102,7 +102,7 @@ async function getProfile(companyId, userId) {
  */
 async function listUsers(companyId, queryParams) {
     const searchTerm = queryParams?.search;
-    
+
     let params = {
         TableName: "gadash_users",
         IndexName: "companyIdIndex",
@@ -121,7 +121,7 @@ async function listUsers(companyId, queryParams) {
     }
 
     const data = await docClient.send(new QueryCommand(params));
-    
+
     return {
         statusCode: 200,
         headers: corsHeaders,
@@ -139,6 +139,7 @@ async function createUser(companyId, body) {
     if (!email || !name) {
         return {
             statusCode: 400,
+            headers: corsHeaders, // Added this
             body: JSON.stringify({ message: "Email and Name are required" })
         };
     }
@@ -197,7 +198,11 @@ async function updateUser(companyId, targetUserId, body) {
     }));
 
     if (!existing.Item || existing.Item.companyId !== companyId) {
-        return { statusCode: 404, body: JSON.stringify({ message: "User not found" }) };
+        return {
+            statusCode: 404,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: "User not found" })
+        };
     }
 
     // Update DynamoDB
@@ -209,7 +214,7 @@ async function updateUser(companyId, targetUserId, body) {
         updateExp += ", #name = :name";
         expNames["#name"] = "name";
         expValues[":name"] = name;
-        
+
         // Also update Cognito
         await cognitoClient.send(new AdminUpdateUserAttributesCommand({
             UserPoolId: userPoolId,
@@ -219,7 +224,8 @@ async function updateUser(companyId, targetUserId, body) {
     }
 
     if (permissions) {
-        updateExp += ", permissions = :p";
+        updateExp += ", #permissions = :p";
+        expNames["#permissions"] = "permissions";
         expValues[":p"] = permissions;
     }
 
@@ -256,10 +262,10 @@ async function updateUser(companyId, targetUserId, body) {
  */
 async function deleteUser(companyId, targetUserId, requesterUserId) {
     if (targetUserId === requesterUserId) {
-        return { 
-            statusCode: 400, 
+        return {
+            statusCode: 400,
             headers: corsHeaders,
-            body: JSON.stringify({ message: "You cannot delete yourself" }) 
+            body: JSON.stringify({ message: "You cannot delete yourself" })
         };
     }
 
@@ -270,10 +276,10 @@ async function deleteUser(companyId, targetUserId, requesterUserId) {
     }));
 
     if (!existing.Item || existing.Item.companyId !== companyId) {
-        return { 
-            statusCode: 404, 
+        return {
+            statusCode: 404,
             headers: corsHeaders,
-            body: JSON.stringify({ message: "User not found" }) 
+            body: JSON.stringify({ message: "User not found" })
         };
     }
 

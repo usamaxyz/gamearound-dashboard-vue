@@ -52,6 +52,7 @@ export const handler = async (event) => {
                 UserAttributes: [
                     { Name: "email", Value: userEmail },
                     { Name: "email_verified", Value: "true" },
+                    { Name: "name", Value: userName },
                     { Name: "custom:company_id", Value: companyId }
                 ],
                 MessageAction: "SUPPRESS" // Don't send welcome email since we set password manually
