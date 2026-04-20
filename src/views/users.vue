@@ -269,6 +269,7 @@ export default {
       switch (role.toLowerCase()) {
         case 'admin': return 'Shield';
         case 'manage_users': return 'Users';
+        case 'manage_games': return 'Gamepad2';
         default: return 'Layout';
       }
     },

@@ -24,7 +24,7 @@ const router = createRouter({
     routes: routes,
 })
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, from) => {
     const authStore = useAuthStore()
     
     // Check session on every navigation if not loaded
@@ -36,16 +36,16 @@ router.beforeEach(async (to, from, next) => {
 
     if (to.meta.auth && !isAuthenticated) {
         // Redirect to login if path requires auth and user is not authenticated
-        next({ name: 'login' })
+        return { name: 'login' };
     } else if (to.meta.guest && isAuthenticated) {
         // Redirect to home if path is for guests only and user is authenticated
-        next({ name: 'home' })
+        return { name: 'home' };
     } else if (to.meta.permission && !authStore.hasPermission(to.meta.permission)) {
         // Redirect to home if user lacks required permission
-        next({ name: 'home' })
-    } else {
-        next()
+        return { name: 'home' };
     }
+    
+    return true;
 })
 
 export default router;

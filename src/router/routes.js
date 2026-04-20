@@ -20,6 +20,12 @@ export default [
         meta: { auth: true, permission: 'manage_users' }
     },
     {
+        path: '/games',
+        name: 'games',
+        component: () => import('../views/games.vue'),
+        meta: { auth: true, permission: 'manage_games' }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../views/not_found.vue'),

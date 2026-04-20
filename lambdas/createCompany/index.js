@@ -89,7 +89,7 @@ export const handler = async (event) => {
                 companyId: companyId,
                 email: userEmail,
                 name: userName,
-                permissions: ["admin", "manage_users"],
+                permissions: ["admin", "manage_users", "manage_games"],
                 createdAt: createdAt,
                 updatedAt: createdAt,
                 status: "ACTIVE"

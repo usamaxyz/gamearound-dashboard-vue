@@ -36,7 +36,7 @@ export default {
   },
   data() {
     return {
-      expandedGroups: ['Management']
+      expandedGroups: [],
     };
   },
   computed: {
@@ -47,25 +47,28 @@ export default {
           to: { name: 'home' }, 
           icon: 'LayoutDashboard' 
         },
-        {
-          name: 'Management',
-          icon: 'Building2',
-          children: [
-            { 
-              name: 'Users', 
-              to: { name: 'users' }, 
-              icon: 'Users',
-              show: this.authStore.hasPermission('manage_users')
-            },
-            { name: 'Companies', to: '/settings', icon: 'Building2', show: true },
-          ].filter(child => child.show !== false)
+        { 
+          name: 'Users', 
+          to: { name: 'users' }, 
+          icon: 'Users',
+          show: this.authStore.hasPermission('manage_users')
         },
         { 
           name: 'Games', 
           to: '/games', 
-          icon: 'Gamepad2' 
+          icon: 'Gamepad2',
+          show: this.authStore.hasPermission('manage_games')
         },
-      ];
+        {
+          name: 'Management',
+          icon: 'Building2',
+          children: [
+            { name: 'Overview', to: '/example1', icon: 'LayoutDashboard', show: true },
+            { name: 'Companies', to: '/example2', icon: 'Building2', show: true },
+            { name: 'Settings', to: '/example3', icon: 'Settings', show: true },
+          ].filter(child => child.show !== false)
+        },
+      ].filter(item => item.show !== false);
     }
   },
   methods: {
