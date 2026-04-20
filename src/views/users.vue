@@ -210,6 +210,27 @@
         </div>
       </div>
     </Teleport>
+    
+    <!-- Delete Confirmation Modal -->
+    <Teleport to="body">
+      <div v-if="userToDelete" class="modal-overlay danger" @click.self="userToDelete = null">
+        <div class="modal-card danger">
+          <div class="modal-header">
+            <div class="header-content">
+              <h2>Delete User</h2>
+              <p>Are you sure you want to delete <strong>{{ userToDelete.name }}</strong>? This action cannot be undone.</p>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button @click="userToDelete = null" class="btn-secondary">Cancel</button>
+            <button @click="handleDelete" class="btn-danger" :disabled="formLoading">
+              <span v-if="!formLoading">Delete Permanently</span>
+              <RefreshCw v-else class="spinning" :size="18" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -336,8 +357,21 @@ export default {
       this.form = { name: '', email: '', permissions: [], status: 'ACTIVE' };
     },
     confirmDelete(user) {
-        // Implement delete confirmation logic if needed
-        console.log('Confirm delete', user);
+      this.userToDelete = user;
+    },
+    async handleDelete() {
+      if (!this.userToDelete) return;
+      this.formLoading = true;
+      try {
+        await api.delete(`/users/${this.userToDelete.userId}`);
+        await this.fetchUsers();
+        this.userToDelete = null;
+      } catch (err) {
+        console.error('Failed to delete user:', err);
+        alert(err.response?.data?.message || 'Error deleting user');
+      } finally {
+        this.formLoading = false;
+      }
     },
     async saveUser() {
       this.formLoading = true;
@@ -366,5 +400,3 @@ export default {
   }
 };
 </script>
-
-

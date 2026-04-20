@@ -10,6 +10,10 @@
   justify-content: center;
   z-index: var(--z-modal);
   animation: fadeInOverlay 0.3s ease-out;
+
+  &.danger {
+    background: rgba(0, 0, 0, 0.8);
+  }
 }
 
 .modal-card {
@@ -23,6 +27,10 @@
   &.mini {
     max-width: 420px;
     text-align: center;
+  }
+
+  &.danger {
+    max-width: 450px;
   }
 }
 

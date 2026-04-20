@@ -28,12 +28,7 @@
     <div class="filters-bar">
       <div class="search-wrapper">
         <Search class="search-icon" :size="20" />
-        <input 
-          v-model="searchQuery" 
-          type="text" 
-          placeholder="Search games..." 
-          @input="handleSearch"
-        />
+        <input v-model="searchQuery" type="text" placeholder="Search games..." @input="handleSearch" />
       </div>
       <button @click="fetchGames" class="btn-ghost" :disabled="loading" title="Refresh">
         <RefreshCw :class="{ 'spinning': loading }" :size="20" />
@@ -71,18 +66,10 @@
             </td>
             <td>
               <div class="row-actions">
-                <button 
-                  @click="editGame(game)" 
-                  class="btn-ghost edit" 
-                  title="Edit Game"
-                >
+                <button @click="editGame(game)" class="btn-ghost edit" title="Edit Game">
                   <Edit2 :size="16" />
                 </button>
-                <button 
-                  @click="confirmDelete(game)" 
-                  class="btn-ghost delete" 
-                  title="Delete Game"
-                >
+                <button @click="confirmDelete(game)" class="btn-ghost delete" title="Delete Game">
                   <Trash2 :size="16" />
                 </button>
               </div>
@@ -90,12 +77,12 @@
           </tr>
         </tbody>
       </table>
-      
+
       <div v-else-if="loading" class="empty-state">
         <RefreshCw class="spinning" :size="32" />
         <p style="margin-top: 1rem">Loading organization games...</p>
       </div>
-      
+
       <div v-else class="empty-state">
         <div class="empty-icon">
           <Gamepad2 :size="48" />
@@ -114,9 +101,11 @@
               <h2>{{ editingGame ? 'Edit Game' : 'Add New Game' }}</h2>
               <p v-if="!editingGame">Enter the details for the new game.</p>
             </div>
-            <button @click="closeModal" class="btn-ghost"><X :size="20" /></button>
+            <button @click="closeModal" class="btn-ghost">
+              <X :size="20" />
+            </button>
           </div>
-          
+
           <form @submit.prevent="saveGame">
             <div class="form-group">
               <label>Game Name</label>
@@ -125,17 +114,18 @@
                 <input v-model="form.name" type="text" placeholder="e.g. Space Odyssey" required />
               </div>
             </div>
-            
+
             <div class="form-group">
               <label>Game ID (Permanent)</label>
               <div class="input-wrapper has-icon">
                 <Code :size="18" class="input-icon" />
-                <input v-model="form.gameId" type="text" :disabled="!!editingGame" placeholder="e.g. space-odyssey-01" required />
+                <input v-model="form.gameId" type="text" :disabled="!!editingGame" placeholder="e.g. space-odyssey-01"
+                  required />
               </div>
               <p v-if="editingGame" class="input-hint">Game ID cannot be changed.</p>
               <p v-else class="input-hint">Used for API integration. Must be unique.</p>
             </div>
-            
+
             <div class="modal-actions">
               <button type="button" @click="closeModal" class="btn-secondary">Discard</button>
               <button type="submit" class="btn-primary" :disabled="formLoading">
@@ -148,21 +138,22 @@
       </div>
 
       <!-- Delete Confirmation -->
-      <div v-if="gameToDelete" class="modal-overlay delete-overlay" @click.self="gameToDelete = null">
-        <div class="modal-card delete-card">
-            <div class="modal-header">
-                <div class="header-content">
-                    <h2>Delete Game</h2>
-                    <p>Are you sure you want to delete <strong>{{ gameToDelete.name }}</strong>? This action cannot be undone.</p>
-                </div>
+      <div v-if="gameToDelete" class="modal-overlay danger" @click.self="gameToDelete = null">
+        <div class="modal-card danger">
+          <div class="modal-header">
+            <div class="header-content">
+              <h2>Delete Game</h2>
+              <p>Are you sure you want to delete <strong>{{ gameToDelete.name }}</strong>? This action cannot be undone.
+              </p>
             </div>
-            <div class="modal-actions">
-                <button @click="gameToDelete = null" class="btn-secondary">Cancel</button>
-                <button @click="handleDelete" class="btn-danger" :disabled="formLoading">
-                    <span v-if="!formLoading">Delete Permanently</span>
-                    <RefreshCw v-else class="spinning" :size="18" />
-                </button>
-            </div>
+          </div>
+          <div class="modal-actions">
+            <button @click="gameToDelete = null" class="btn-secondary">Cancel</button>
+            <button @click="handleDelete" class="btn-danger" :disabled="formLoading">
+              <span v-if="!formLoading">Delete Permanently</span>
+              <RefreshCw v-else class="spinning" :size="18" />
+            </button>
+          </div>
         </div>
       </div>
     </Teleport>
@@ -171,7 +162,7 @@
 
 <script>
 import api from '@/services/api';
-import { 
+import {
   Gamepad2, Search, RefreshCw, Edit2, Trash2, X, Activity, Layout, Code
 } from 'lucide-vue-next';
 
@@ -275,46 +266,3 @@ export default {
   }
 };
 </script>
-
-<style lang="scss" scoped>
-.game-id-badge {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.85rem;
-    color: var(--accent-light);
-}
-
-.delete-overlay {
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
-}
-
-.delete-card {
-    max-width: 450px !important;
-}
-
-/* Local override for dangerous actions */
-.btn-danger {
-    background: linear-gradient(135deg, #ff4d4d 0%, #d42a2a 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(212, 42, 42, 0.4);
-    }
-
-    &:disabled {
-        opacity: 0.7;
-        cursor: not-allowed;
-    }
-}
-</style>

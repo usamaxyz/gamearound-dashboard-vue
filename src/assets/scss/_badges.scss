@@ -10,23 +10,29 @@
   color: var(--text-muted);
   border: 1px solid transparent;
 
-  &.active, &.success { 
-    background: rgba(16, 185, 129, 0.1); 
+  &.active,
+  &.success {
+    background: rgba(16, 185, 129, 0.1);
     color: var(--success);
     border-color: rgba(16, 185, 129, 0.2);
   }
-  &.primary, &.admin { 
-    background: rgba(56, 189, 248, 0.1); 
+
+  &.primary,
+  &.admin {
+    background: rgba(56, 189, 248, 0.1);
     color: var(--primary);
     border-color: rgba(56, 189, 248, 0.2);
   }
-  &.accent, &.developer { 
-    background: rgba(129, 140, 248, 0.1); 
+
+  &.accent,
+  &.developer {
+    background: rgba(129, 140, 248, 0.1);
     color: var(--accent);
     border-color: rgba(129, 140, 248, 0.2);
   }
-  &.danger { 
-    background: rgba(239, 68, 68, 0.1); 
+
+  &.danger {
+    background: rgba(239, 68, 68, 0.1);
     color: var(--danger);
     border-color: rgba(239, 68, 68, 0.2);
   }
@@ -49,11 +55,29 @@
 
   &.active {
     color: var(--success);
-    &::before { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+    &::before {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
   }
 
   &.inactive {
     color: var(--text-muted);
-    &::before { background: var(--text-muted); }
+
+    &::before {
+      background: var(--text-muted);
+    }
   }
+}
+
+.badge-code,
+.game-id-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-light);
 }

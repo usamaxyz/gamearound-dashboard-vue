@@ -59,15 +59,15 @@
 
 .btn-danger {
   @extend .btn;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  color: var(--danger);
+  background: linear-gradient(135deg, #ff4d4d 0%, #d42a2a 100%);
+  color: white;
+  border: none;
+  font-weight: 600;
 
   &:hover:not(:disabled) {
-    background: var(--danger);
-    color: #fff;
-    border-color: var(--danger);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, #ff5e5e 0%, #e63939 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(212, 42, 42, 0.4);
   }
 }
 
