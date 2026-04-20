@@ -105,10 +105,20 @@
             </td>
             <td>
               <div class="row-actions">
-                <button @click="editUser(user)" class="btn-ghost edit" title="Edit User">
+                <button 
+                  @click="editUser(user)" 
+                  class="btn-ghost edit" 
+                  title="Edit User"
+                  :disabled="!canModifyUser(user)"
+                >
                   <Edit2 :size="16" />
                 </button>
-                <button @click="confirmDelete(user)" class="btn-ghost delete" title="Delete User">
+                <button 
+                  @click="confirmDelete(user)" 
+                  class="btn-ghost delete" 
+                  title="Delete User"
+                  :disabled="!canModifyUser(user)"
+                >
                   <Trash2 :size="16" />
                 </button>
               </div>
@@ -206,6 +216,7 @@
 <script>
 import api from '@/services/api';
 import { useAppStore } from '@/stores/app';
+import { useAuthStore } from '@/stores/auth';
 import { 
   UserPlus, Users, ShieldCheck, UserCheck, Search, 
   RefreshCw, Edit2, Trash2, X, UserX, User, Mail,
@@ -221,7 +232,8 @@ export default {
   },
   setup() {
     const appStore = useAppStore();
-    return { appStore };
+    const authStore = useAuthStore();
+    return { appStore, authStore };
   },
   data() {
     return {
@@ -259,6 +271,21 @@ export default {
         case 'manage_users': return 'Users';
         default: return 'Layout';
       }
+    },
+    canModifyUser(targetUser) {
+      // Rule: Users with manage_users but without admin cannot modify admin users.
+      // 1. If current user is admin, they can modify anyone (except maybe themselves depending on other rules, but here it's about roles)
+      const currentUserIsAdmin = this.authStore.hasPermission('admin');
+      if (currentUserIsAdmin) return true;
+
+      // 2. If current user is NOT admin but has manage_users
+      const targetIsAdmin = targetUser.permissions?.includes('admin');
+      
+      // If target is admin and current user is not, they cannot modify
+      if (targetIsAdmin) return false;
+
+      // Otherwise, they can modify (assuming they have manage_users, which is required to see this page)
+      return true;
     },
     togglePermission(role) {
       const index = this.form.permissions.indexOf(role);

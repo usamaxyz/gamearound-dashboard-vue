@@ -71,11 +71,11 @@ export const handler = async (event) => {
         }
 
         if (method === "PATCH" && resource === "/users/{userId}" && userIdParam) {
-            return await updateUser(requesterCompanyId, userIdParam, JSON.parse(event.body || "{}"));
+            return await updateUser(requesterCompanyId, userIdParam, JSON.parse(event.body || "{}"), requesterPermissions);
         }
 
         if (method === "DELETE" && resource === "/users/{userId}" && userIdParam) {
-            return await deleteUser(requesterCompanyId, userIdParam, requesterUserId);
+            return await deleteUser(requesterCompanyId, userIdParam, requesterUserId, requesterPermissions);
         }
 
         return {
@@ -215,7 +215,7 @@ async function createUser(companyId, body) {
 /**
  * Update user (permissions, status, name)
  */
-async function updateUser(companyId, targetUserId, body) {
+async function updateUser(companyId, targetUserId, body, requesterPermissions) {
     // Whitelist only allowed fields
     const { name, permissions, status } = body;
 
@@ -230,6 +230,18 @@ async function updateUser(companyId, targetUserId, body) {
             statusCode: 404,
             headers: corsHeaders,
             body: JSON.stringify({ message: "User not found" })
+        };
+    }
+
+    // Security Check: manage_users cannot update admin users
+    const targetIsAdmin = existing.Item.permissions?.includes("admin");
+    const requesterIsAdmin = requesterPermissions.includes("admin");
+
+    if (targetIsAdmin && !requesterIsAdmin) {
+        return {
+            statusCode: 403,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: "Forbidden: You cannot update a user with admin permission" })
         };
     }
 
@@ -288,7 +300,7 @@ async function updateUser(companyId, targetUserId, body) {
 /**
  * Delete user from Cognito and DynamoDB
  */
-async function deleteUser(companyId, targetUserId, requesterUserId) {
+async function deleteUser(companyId, targetUserId, requesterUserId, requesterPermissions) {
     if (targetUserId === requesterUserId) {
         return {
             statusCode: 400,
@@ -308,6 +320,18 @@ async function deleteUser(companyId, targetUserId, requesterUserId) {
             statusCode: 404,
             headers: corsHeaders,
             body: JSON.stringify({ message: "User not found" })
+        };
+    }
+
+    // Security Check: manage_users cannot delete admin users
+    const targetIsAdmin = existing.Item.permissions?.includes("admin");
+    const requesterIsAdmin = requesterPermissions.includes("admin");
+
+    if (targetIsAdmin && !requesterIsAdmin) {
+        return {
+            statusCode: 403,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: "Forbidden: You cannot delete a user with admin permission" })
         };
     }
 
