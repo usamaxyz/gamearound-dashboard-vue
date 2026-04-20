@@ -8,6 +8,12 @@ export default [
         meta: { guest: true }
     },
     {
+        path: '/confirm-password',
+        name: 'confirm-password',
+        component: () => import('../views/confirm-password.vue'),
+        meta: { guest: true }
+    },
+    {
         path: '/',
         name: 'home',
         component: home,

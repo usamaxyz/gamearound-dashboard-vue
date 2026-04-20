@@ -96,7 +96,7 @@ export default {
           await this.authStore.checkAuth();
           this.$router.push({ name: 'home' });
         } else if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-          this.error = 'New password required. Please reset your password.';
+          this.$router.push({ name: 'confirm-password' });
         }
       } catch (err) {
         console.error('Login error:', err);
