@@ -14,29 +14,21 @@
         </div>
         <div class="stat-info">
           <span class="label">Total Games</span>
-          <span class="value">12</span>
+          <span class="value">{{ authStore.totalGames }}</span>
         </div>
       </div>
       <div class="stat-card">
         <div class="icon-box success">
-          <TrendingUp :size="28" />
+          <Users :size="28" />
         </div>
         <div class="stat-info">
-          <span class="label">Active Users</span>
-          <span class="value">1.2k</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="icon-box accent">
-          <Activity :size="28" />
-        </div>
-        <div class="stat-info">
-          <span class="label">Growth</span>
-          <span class="value">+15%</span>
+          <span class="label">Total Users</span>
+          <span class="value">{{ authStore.totalUsers }}</span>
         </div>
       </div>
     </div>
 
+    <!--
     <div class="content-wrapper">
       <div class="empty-state">
         <div class="empty-icon">
@@ -51,19 +43,20 @@
         </div>
       </div>
     </div>
+    -->
+
   </div>
 </template>
 
 <script>
 import { useAuthStore } from '@/stores/auth';
-import { Gamepad2, TrendingUp, Activity, Layout } from 'lucide-vue-next';
+import { Gamepad2, Users, Layout } from 'lucide-vue-next';
 
 export default {
   name: 'HomeView',
   components: {
     Gamepad2,
-    TrendingUp,
-    Activity,
+    Users,
     Layout
   },
   setup() {

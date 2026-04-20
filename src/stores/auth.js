@@ -59,8 +59,11 @@ export const useAuthStore = defineStore('auth', {
     email: (state) => state.session?.tokens?.idToken?.payload?.email,
     name: (state) => state.profile?.user?.name || '',
     companyName: (state) => state.profile?.company?.name || '',
+    totalUsers: (state) => state.profile?.stats?.totalUsers || 0,
+    totalGames: (state) => state.profile?.stats?.totalGames || 0,
     hasPermission: (state) => (permission) => {
       return state.profile?.user?.permissions?.includes(permission) || false;
     }
+
   }
 });

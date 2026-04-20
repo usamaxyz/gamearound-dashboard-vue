@@ -106,15 +106,37 @@ async function getProfile(companyId, userId) {
         Key: { companyId: companyId }
     }));
 
+    // Fetch counts for the dashboard
+    const usersCountData = await docClient.send(new QueryCommand({
+        TableName: "gadash_users",
+        IndexName: "companyIdIndex",
+        KeyConditionExpression: "companyId = :cid",
+        ExpressionAttributeValues: { ":cid": companyId },
+        Select: "COUNT"
+    }));
+
+    const gamesCountData = await docClient.send(new QueryCommand({
+        TableName: "gadash_games",
+        IndexName: "companyIdIndex",
+        KeyConditionExpression: "companyId = :cid",
+        ExpressionAttributeValues: { ":cid": companyId },
+        Select: "COUNT"
+    }));
+
     return {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
             user: userRes.Item,
-            company: companyRes.Item
+            company: companyRes.Item,
+            stats: {
+                totalUsers: usersCountData.Count || 0,
+                totalGames: gamesCountData.Count || 0
+            }
         })
     };
 }
+
 
 
 /**
