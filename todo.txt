@@ -74,3 +74,33 @@ permissions needed:
 cognito-idp:AdminCreateUser
 cognito-idp:AdminSetUserPassword
 cognito-idp:AdminGetUser
+
+
+one of the game related tables is gap_config_currency. We want to create a new section for Currency with a new permission manage_currencies.
+
+
+Attributes are:
+{
+  "gameid": {
+    "S": "mkr" //partition key
+  },
+  "id": {
+    "S": "MC" //sort key
+  },
+  "assetUrl": {
+    "S": "https://d298a5ilfxwzg6.cloudfront.net/assets/models/currency/MC.asset"
+  },
+  "imageUrl": {
+    "S": "https://d298a5ilfxwzg6.cloudfront.net/assets/images/currency/MC.png"
+  },
+  "launchDeposit": {
+    "N": "500"
+  },
+  "name": {
+    "S": "Mad Cash"
+  }
+}
+
+for assetUrl and imageUrl, we need to allow admin to choose images and then upload them to S3 pucket and store their url.
+S3 bucket name: gamearound-platform
+upload path: /assets/{gameId}/UI/Currency/

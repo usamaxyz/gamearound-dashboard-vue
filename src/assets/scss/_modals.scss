@@ -29,6 +29,10 @@
     text-align: center;
   }
 
+  &.large {
+    max-width: 800px;
+  }
+
   &.danger {
     max-width: 450px;
   }

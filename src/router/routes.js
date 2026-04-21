@@ -32,6 +32,12 @@ export default [
         meta: { auth: true, permission: 'manage_games' }
     },
     {
+        path: '/currencies',
+        name: 'currencies',
+        component: () => import('../views/currencies.vue'),
+        meta: { auth: true, permission: 'manage_currencies' }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../views/not_found.vue'),

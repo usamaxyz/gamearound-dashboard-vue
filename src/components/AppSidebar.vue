@@ -9,6 +9,7 @@ import {
   ChevronDown, 
   ChevronRight,
   Gamepad2,
+  Coins,
   Info,
   LogOut
 } from 'lucide-vue-next';
@@ -23,6 +24,7 @@ export default {
     ChevronDown,
     ChevronRight,
     Gamepad2,
+    Coins,
     Info,
     LogOut
   },
@@ -58,6 +60,12 @@ export default {
           to: '/games', 
           icon: 'Gamepad2',
           show: this.authStore.hasPermission('manage_games')
+        },
+        { 
+          name: 'Currencies', 
+          to: '/currencies', 
+          icon: 'Coins',
+          show: this.authStore.hasPermission('manage_currencies')
         },
         {
           name: 'Management',
