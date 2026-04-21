@@ -60,10 +60,12 @@
               </td>
               <td>
                 <div class="flex-gap-2">
-                  <a v-if="item.imageUrl" :href="item.imageUrl" target="_blank" class="hover-primary" title="View Image" style="color: var(--text-muted)">
+                  <a v-if="item.imageUrl" :href="item.imageUrl" target="_blank" class="hover-primary" title="View Image"
+                    style="color: var(--text-muted)">
                     <Image :size="16" />
                   </a>
-                  <a v-if="item.assetUrl" :href="item.assetUrl" target="_blank" class="hover-primary" title="View Model" style="color: var(--text-muted)">
+                  <a v-if="item.assetUrl" :href="item.assetUrl" target="_blank" class="hover-primary" title="View Model"
+                    style="color: var(--text-muted)">
                     <FileCode :size="16" />
                   </a>
                 </div>
@@ -148,7 +150,7 @@
               <!-- Row 3: File Uploads -->
               <div class="form-group">
                 <label>Image Asset (PNG/JPG)</label>
-                
+
                 <div class="radio-group">
                   <label class="radio-item">
                     <input type="radio" v-model="imageMode" value="upload" />
@@ -163,13 +165,17 @@
                 <div class="upload-container">
                   <div v-if="form.imageUrl && imageMode === 'upload'" class="upload-preview">
                     <img :src="form.imageUrl" alt="Preview" />
-                    <button type="button" @click="form.imageUrl = ''" class="remove-btn"><X :size="14" /></button>
+                    <button type="button" @click="form.imageUrl = ''" class="remove-btn">
+                      <X :size="14" />
+                    </button>
                   </div>
                   <div class="upload-controls">
-                    <label v-if="imageMode === 'upload'" class="btn-secondary upload-trigger" :class="{ 'disabled': !form.id || uploadingImage }">
+                    <label v-if="imageMode === 'upload'" class="btn-secondary btn-sm upload-trigger"
+                      :class="{ 'disabled': !form.id || uploadingImage }">
                       <Upload :size="16" />
                       <span>{{ uploadingImage ? 'Uploading...' : 'Choose Image' }}</span>
-                      <input type="file" @change="e => handleUpload(e, 'imageUrl', 'UI/Currency')" accept="image/*" hidden />
+                      <input type="file" @change="e => handleUpload(e, 'imageUrl', 'UI/Currency')" accept="image/*"
+                        hidden />
                     </label>
                     <div v-else class="input-wrapper url-input-field">
                       <input v-model="form.imageUrl" type="text" placeholder="Enter Image URL" />
@@ -196,13 +202,17 @@
                   <div v-if="form.assetUrl && assetMode === 'upload'" class="upload-file-info">
                     <FileCode :size="18" />
                     <span class="filename">{{ getFileName(form.assetUrl) }}</span>
-                    <button type="button" @click="form.assetUrl = ''" class="remove-btn"><X :size="14" /></button>
+                    <button type="button" @click="form.assetUrl = ''" class="remove-btn">
+                      <X :size="14" />
+                    </button>
                   </div>
                   <div class="upload-controls">
-                    <label v-if="assetMode === 'upload'" class="btn-secondary upload-trigger" :class="{ 'disabled': !form.id || uploadingAsset }">
+                    <label v-if="assetMode === 'upload'" class="btn-secondary btn-sm upload-trigger"
+                      :class="{ 'disabled': !form.id || uploadingAsset }">
                       <Upload :size="16" />
                       <span>{{ uploadingAsset ? 'Uploading...' : 'Choose Asset' }}</span>
-                      <input type="file" @change="e => handleUpload(e, 'assetUrl', 'UI/Currency')" accept=".asset" hidden />
+                      <input type="file" @change="e => handleUpload(e, 'assetUrl', 'UI/Currency')" accept=".asset"
+                        hidden />
                     </label>
                     <div v-else class="input-wrapper url-input-field">
                       <input v-model="form.assetUrl" type="text" placeholder="Enter Asset URL" />
@@ -229,7 +239,9 @@
           <div class="modal-header">
             <div class="header-content">
               <h2>Delete Currency</h2>
-              <p>Are you sure you want to delete <strong>{{ itemToDelete.name }}</strong>? This will remove it from <strong>{{ selectedGame?.name }}</strong>.</p>
+              <p>Are you sure you want to delete <strong>{{ itemToDelete.name }}</strong>? This will remove it from
+                <strong>{{ selectedGame?.name }}</strong>.
+              </p>
             </div>
           </div>
           <div class="modal-actions">
@@ -293,8 +305,8 @@ export default {
     filteredCurrencies() {
       if (!this.searchQuery) return this.currencies;
       const q = this.searchQuery.toLowerCase();
-      return this.currencies.filter(c => 
-        c.name?.toLowerCase().includes(q) || 
+      return this.currencies.filter(c =>
+        c.name?.toLowerCase().includes(q) ||
         c.id?.toLowerCase().includes(q)
       );
     }
@@ -372,7 +384,7 @@ export default {
         event.target.value = ''; // Reset input
         return;
       }
-      
+
       const file = event.target.files[0];
       if (!file) return;
 
@@ -442,5 +454,3 @@ export default {
   }
 };
 </script>
-
-

@@ -3,7 +3,8 @@
 .form-group {
   margin-bottom: 1.5rem;
 
-  label, .form-label {
+  label,
+  .form-label {
     display: block;
     font-size: 0.8125rem;
     font-weight: 700;
@@ -18,12 +19,13 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4) var(--space-6);
-  
+
   &.gap-lg {
     gap: var(--space-6);
   }
 
-  .full-width, .span-2 {
+  .full-width,
+  .span-2 {
     grid-column: span 2;
   }
 
@@ -44,7 +46,9 @@
     pointer-events: none;
   }
 
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     width: 100%;
     padding: 0.875rem 1rem;
     background: rgba(15, 23, 42, 0.4);
@@ -69,7 +73,10 @@
   }
 
   &.has-icon {
-    input, textarea, select {
+
+    input,
+    textarea,
+    select {
       padding-left: 2.75rem;
     }
   }
@@ -86,7 +93,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  
+
   .selection-pill {
     display: flex;
     align-items: center;
@@ -99,13 +106,13 @@
     transition: all var(--transition-fast);
     font-size: 0.875rem;
     color: var(--text-muted);
-    
+
     &:hover {
       background: rgba(255, 255, 255, 0.06);
       border-color: var(--border-bright);
       color: var(--text-main);
     }
-    
+
     &.active {
       background: rgba(56, 189, 248, 0.1);
       border-color: var(--primary);
@@ -124,15 +131,15 @@
     position: relative;
     flex: 1;
     max-width: 400px;
-    
-    .search-icon { 
-      position: absolute; 
-      left: 1rem; 
-      top: 50%; 
-      transform: translateY( -50% ); 
-      color: var(--text-dim); 
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
     }
-    
+
     input {
       width: 100%;
       padding: 0.75rem 1rem 0.75rem 3rem;
@@ -141,7 +148,7 @@
       border-radius: var(--radius-md);
       color: var(--text-main);
       transition: all var(--transition-fast);
-      
+
     }
   }
 }
@@ -176,7 +183,7 @@
     }
 
     &.active {
-      background: #10b981; 
+      background: #10b981;
       border-color: #10b981;
 
       .toggle-thumb {
@@ -327,14 +334,16 @@
     .upload-trigger {
       white-space: nowrap;
       cursor: pointer;
-      padding: 0.5rem 1.25rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      
+
+      // Ensure text is readable - use main text color
+      color: var(--text-main) !important;
+
       &.disabled {
         opacity: 0.5;
         cursor: not-allowed;
+        pointer-events: none;
       }
     }
 
@@ -344,4 +353,3 @@
     }
   }
 }
-
