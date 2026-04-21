@@ -7,7 +7,7 @@
     <div class="custom-select" v-if="games.length > 0">
       <select :value="selectedGameId" @change="e => setSelectedGame(e.target.value)">
         <option v-for="game in games" :key="game.gameId" :value="game.gameId">
-          {{ game.name }} ({{ game.gameId }})
+          {{ game.name }}
         </option>
       </select>
       <ChevronDown class="select-icon" :size="16" />
@@ -106,7 +106,8 @@ export default {
     }
   }
 
-  .selector-loading, .selector-empty {
+  .selector-loading,
+  .selector-empty {
     display: flex;
     align-items: center;
     gap: var(--space-2);
