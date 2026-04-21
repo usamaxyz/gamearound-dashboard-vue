@@ -1,0 +1,57 @@
+/* Vertical Stepper Component (Reusable Bootstrap-style) */
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  margin-top: var(--space-6);
+
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-dim);
+    transition: all var(--transition-normal);
+    padding: var(--space-1) 0;
+
+    .step-icon {
+      width: 18px;
+      height: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      
+      &.pending { color: var(--text-dim); opacity: 0.4; }
+      &.loading { color: var(--primary); }
+      &.success { color: var(--success); }
+      &.error   { color: var(--danger); }
+    }
+
+    .step-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      white-space: nowrap; // Ensure single line
+    }
+
+    &.active {
+      .step-text {
+        color: var(--text-muted); // Softer than white
+      }
+    }
+
+    &.completed {
+      .step-icon {
+        color: var(--success);
+      }
+      .step-text {
+        color: var(--success);
+      }
+    }
+  }
+}

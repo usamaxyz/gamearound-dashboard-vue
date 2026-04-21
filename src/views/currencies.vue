@@ -43,12 +43,9 @@
             <tr v-for="item in filteredCurrencies" :key="item.id">
               <td>
                 <div class="user-row-info">
-                  <div class="avatar-square" v-if="item.imageUrl">
-                    <img :src="item.imageUrl" :alt="item.name" />
-                  </div>
-                  <div class="avatar accent" v-else>
-                    {{ item.name?.charAt(0).toUpperCase() || 'C' }}
-                  </div>
+<!--                  <div class="avatar accent">-->
+<!--                    {{ item.name?.charAt(0).toUpperCase() || 'C' }}-->
+<!--                  </div>-->
                   <div class="details">
                     <span class="name">{{ item.name }}</span>
                   </div>
@@ -56,7 +53,7 @@
               </td>
               <td><code class="badge">{{ item.id }}</code></td>
               <td>
-                <span class="text-mono text-primary" style="font-weight: 600">{{ item.launchDeposit || 0 }}</span>
+                <span class="text-mono">{{ item.launchDeposit || 0 }}</span>
               </td>
               <td>
                 <div class="flex-gap-2">
@@ -149,7 +146,7 @@
 
               <!-- Row 3: File Uploads -->
               <div class="form-group">
-                <label>Image Asset (PNG/JPG)</label>
+                <label>Image Asset</label>
 
                 <div class="radio-group">
                   <label class="radio-item">
@@ -163,21 +160,21 @@
                 </div>
 
                 <div class="upload-container">
-                  <div v-if="form.imageUrl && imageMode === 'upload'" class="upload-preview">
-                    <img :src="form.imageUrl" alt="Preview" />
-                    <button type="button" @click="form.imageUrl = ''" class="remove-btn">
+                  <!-- Preview for already uploaded or selected file -->
+                  <div v-if="(form.imageUrl || form.imageFile) && imageMode === 'upload'" class="upload-preview">
+                    <img :src="form.imageFile ? getFilePreview(form.imageFile) : form.imageUrl" alt="Preview" />
+                    <button type="button" @click="clearFile('image')" class="remove-btn">
                       <X :size="14" />
                     </button>
                   </div>
                   <div class="upload-controls">
                     <template v-if="imageMode === 'upload'">
                       <button type="button" class="btn btn-secondary btn-sm"
-                        :disabled="!form.id || uploadingImage" title="Upload Image" @click="$refs.imageInput.click()">
-                        <RefreshCw v-if="uploadingImage" class="spinning" :size="16" />
-                        <Upload v-else :size="16" />
-                        <span>{{ uploadingImage ? 'Uploading...' : 'Choose Image' }}</span>
+                        :disabled="!form.id" title="Select Image" @click="$refs.imageInput.click()">
+                        <Upload :size="16" />
+                        <span>{{ form.imageFile ? 'Change Image' : 'Choose Image' }}</span>
                       </button>
-                      <input type="file" ref="imageInput" @change="e => handleUpload(e, 'imageUrl', 'UI/Currency')" accept="image/*" hidden />
+                      <input type="file" ref="imageInput" @change="e => prepareFile(e, 'image')" hidden />
                     </template>
                     
                     <div v-else class="input-wrapper url-input-field">
@@ -185,13 +182,16 @@
                     </div>
                   </div>
                   <p v-if="imageMode === 'upload' && !form.id" class="input-hint">
-                    Please enter a Currency ID first to enable upload.
+                    Please enter a Currency ID first.
+                  </p>
+                  <p v-if="form.imageFile" class="text-primary fs-sm mt-1">
+                    Ready to upload: {{ form.imageFile.name }}
                   </p>
                 </div>
               </div>
 
               <div class="form-group">
-                <label>3D Asset (.asset)</label>
+                <label>3D Asset</label>
 
                 <div class="radio-group">
                   <label class="radio-item">
@@ -205,22 +205,21 @@
                 </div>
 
                 <div class="upload-container">
-                  <div v-if="form.assetUrl && assetMode === 'upload'" class="upload-file-info">
+                  <div v-if="(form.assetUrl || form.assetFile) && assetMode === 'upload'" class="upload-file-info">
                     <FileCode :size="18" />
-                    <span class="filename">{{ getFileName(form.assetUrl) }}</span>
-                    <button type="button" @click="form.assetUrl = ''" class="remove-btn">
+                    <span class="filename">{{ form.assetFile ? form.assetFile.name : getFileName(form.assetUrl) }}</span>
+                    <button type="button" @click="clearFile('asset')" class="remove-btn">
                       <X :size="14" />
                     </button>
                   </div>
                   <div class="upload-controls">
                     <template v-if="assetMode === 'upload'">
                       <button type="button" class="btn btn-secondary btn-sm"
-                        :disabled="!form.id || uploadingAsset" title="Upload Asset" @click="$refs.assetInput.click()">
-                        <RefreshCw v-if="uploadingAsset" class="spinning" :size="16" />
-                        <Upload v-else :size="16" />
-                        <span>{{ uploadingAsset ? 'Uploading...' : 'Choose Asset' }}</span>
+                        :disabled="!form.id" title="Select Asset" @click="$refs.assetInput.click()">
+                        <Upload :size="16" />
+                        <span>{{ form.assetFile ? 'Change Asset' : 'Choose Asset' }}</span>
                       </button>
-                      <input type="file" ref="assetInput" @change="e => handleUpload(e, 'assetUrl', 'UI/Currency')" accept=".asset" hidden />
+                      <input type="file" ref="assetInput" @change="e => prepareFile(e, 'asset')" hidden />
                     </template>
                     
                     <div v-else class="input-wrapper url-input-field">
@@ -228,15 +227,45 @@
                     </div>
                   </div>
                   <p v-if="assetMode === 'upload' && !form.id" class="input-hint">
-                    Please enter a Currency ID first to enable upload.
+                    Please enter a Currency ID first.
                   </p>
                 </div>
               </div>
             </div>
 
+            <!-- Progress Steps (Visible when saving) -->
+            <div v-if="showProgress" class="steps-list fadeIn">
+              <div class="step-item" :class="{ 'active': stepStatus.store === 'loading', 'completed': stepStatus.store === 'success' }">
+                <div class="step-icon" :class="stepStatus.store">
+                  <RefreshCw v-if="stepStatus.store === 'loading'" class="spinning" :size="18" />
+                  <CheckCircle2 v-else-if="stepStatus.store === 'success'" :size="18" />
+                  <Circle v-else :size="18" />
+                </div>
+                <span class="step-text">Storing currency data...</span>
+              </div>
+              
+              <div v-if="imageMode === 'upload' && form.imageFile" class="step-item" :class="{ 'active': stepStatus.image === 'loading', 'completed': stepStatus.image === 'success' }">
+                <div class="step-icon" :class="stepStatus.image">
+                  <RefreshCw v-if="stepStatus.image === 'loading'" class="spinning" :size="18" />
+                  <CheckCircle2 v-else-if="stepStatus.image === 'success'" :size="18" />
+                  <Circle v-else :size="18" />
+                </div>
+                <span class="step-text">Uploading image asset...</span>
+              </div>
+
+              <div v-if="assetMode === 'upload' && form.assetFile" class="step-item" :class="{ 'active': stepStatus.asset === 'loading', 'completed': stepStatus.asset === 'success' }">
+                <div class="step-icon" :class="stepStatus.asset">
+                  <RefreshCw v-if="stepStatus.asset === 'loading'" class="spinning" :size="18" />
+                  <CheckCircle2 v-else-if="stepStatus.asset === 'success'" :size="18" />
+                  <Circle v-else :size="18" />
+                </div>
+                <span class="step-text">Uploading 3D model asset...</span>
+              </div>
+            </div>
+
             <div class="modal-actions">
-              <button type="button" @click="closeModal" class="btn-secondary">Cancel</button>
-              <button type="submit" class="btn-primary" :disabled="formLoading || uploadingImage || uploadingAsset">
+              <button type="button" @click="closeModal" class="btn-secondary" :disabled="formLoading">Cancel</button>
+              <button type="submit" class="btn-primary" :disabled="formLoading">
                 <span v-if="!formLoading">{{ editingItem ? 'Save Changes' : 'Create Currency' }}</span>
                 <RefreshCw v-else class="spinning" :size="18" />
               </button>
@@ -276,14 +305,14 @@ import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
 import GameSelector from '@/components/GameSelector.vue';
 import {
-  Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2
+  Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle
 } from 'lucide-vue-next';
 
 export default {
   name: 'CurrenciesView',
   components: {
     GameSelector,
-    Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2
+    Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle
   },
   setup() {
     const gamesStore = useGamesStore();
@@ -306,11 +335,19 @@ export default {
         name: '',
         launchDeposit: 0,
         imageUrl: '',
-        assetUrl: ''
+        assetUrl: '',
+        imageFile: null,
+        assetFile: null
       },
       imageMode: 'upload', // 'upload' or 'link'
       assetMode: 'upload', // 'upload' or 'link'
-      searchTimeout: null
+      searchTimeout: null,
+      showProgress: false,
+      stepStatus: {
+        store: 'pending',
+        image: 'pending',
+        asset: 'pending'
+      }
     };
   },
   computed: {
@@ -355,18 +392,24 @@ export default {
         name: '',
         launchDeposit: 0,
         imageUrl: '',
-        assetUrl: ''
+        assetUrl: '',
+        imageFile: null,
+        assetFile: null
       };
       this.imageMode = 'upload';
       this.assetMode = 'upload';
+      this.showProgress = false;
+      this.stepStatus = { store: 'pending', image: 'pending', asset: 'pending' };
       this.showModal = true;
     },
     editCurrency(item) {
       this.editingItem = item;
-      this.form = { ...item };
+      this.form = { ...item, imageFile: null, assetFile: null };
       // Force link mode in edit currency as requested
       this.imageMode = 'link';
       this.assetMode = 'link';
+      this.showProgress = false;
+      this.stepStatus = { store: 'pending', image: 'pending', asset: 'pending' };
       this.showModal = true;
     },
     confirmDelete(item) {
@@ -390,19 +433,22 @@ export default {
       this.showModal = false;
       this.editingItem = null;
     },
-    async handleUpload(event, field, category) {
-      if (!this.form.id) {
-        alert('Please enter a Currency ID first to ensure correct file naming.');
-        event.target.value = ''; // Reset input
-        return;
-      }
-
+    prepareFile(event, type) {
       const file = event.target.files[0];
       if (!file) return;
-
-      if (field === 'imageUrl') this.uploadingImage = true;
-      else this.uploadingAsset = true;
-
+      this.form[type + 'File'] = file;
+    },
+    clearFile(type) {
+      this.form[type + 'File'] = null;
+      if (type === 'image') this.form.imageUrl = '';
+      else this.form.assetUrl = '';
+    },
+    getFilePreview(file) {
+      return URL.createObjectURL(file);
+    },
+    async performUpload(file, field, category) {
+      if (!file) return;
+      
       try {
         // 1. Get pre-signed URL
         const res = await api.post('/assets/upload', {
@@ -420,14 +466,12 @@ export default {
           headers: { 'Content-Type': file.type }
         });
 
-        // 3. Update form
+        // 3. Update form/field
         this.form[field] = finalUrl;
+        return true;
       } catch (err) {
-        console.error('Upload failed:', err);
-        alert('Failed to upload file. Check permissions.');
-      } finally {
-        if (field === 'imageUrl') this.uploadingImage = false;
-        else this.uploadingAsset = false;
+        console.error(`Upload failed for ${field}:`, err);
+        throw err;
       }
     },
     getFileName(url) {
@@ -438,25 +482,70 @@ export default {
     async saveCurrency() {
       if (!this.selectedGameId) return;
       this.formLoading = true;
+      this.showProgress = true;
+      
+      // Step 1: Store Currency
+      this.stepStatus.store = 'loading';
       try {
         const payload = {
           ...this.form,
           gameid: this.selectedGameId
         };
+        // Remove file objects from payload
+        delete payload.imageFile;
+        delete payload.assetFile;
 
         if (this.editingItem) {
           await api.patch(`/currencies/${this.selectedGameId}/${this.editingItem.id}`, payload);
         } else {
           await api.post(`/currencies/${this.selectedGameId}`, payload);
         }
-        await this.fetchCurrencies();
-        this.closeModal();
+        this.stepStatus.store = 'success';
       } catch (err) {
-        console.error('Failed to save currency:', err);
-        alert(err.response?.data?.message || 'Error saving currency');
-      } finally {
+        this.stepStatus.store = 'error';
+        console.error('Failed to store currency:', err);
+        alert(err.response?.data?.message || 'Error storing currency');
         this.formLoading = false;
+        return;
       }
+
+      // Step 2: Upload Image
+      if (this.imageMode === 'upload' && this.form.imageFile) {
+        this.stepStatus.image = 'loading';
+        try {
+          await this.performUpload(this.form.imageFile, 'imageUrl', 'UI/Currencies');
+          // Update the record with the final URL
+          await api.patch(`/currencies/${this.selectedGameId}/${this.form.id}`, { imageUrl: this.form.imageUrl });
+          this.stepStatus.image = 'success';
+        } catch (err) {
+          this.stepStatus.image = 'error';
+          alert('Image upload failed, but currency was stored.');
+        }
+      } else {
+        this.stepStatus.image = 'success'; // Skipped
+      }
+
+      // Step 3: Upload Asset
+      if (this.assetMode === 'upload' && this.form.assetFile) {
+        this.stepStatus.asset = 'loading';
+        try {
+          await this.performUpload(this.form.assetFile, 'assetUrl', 'UI/Currencies');
+          // Update the record with the final URL
+          await api.patch(`/currencies/${this.selectedGameId}/${this.form.id}`, { assetUrl: this.form.assetUrl });
+          this.stepStatus.asset = 'success';
+        } catch (err) {
+          this.stepStatus.asset = 'error';
+          alert('Asset upload failed, but currency was stored.');
+        }
+      } else {
+        this.stepStatus.asset = 'success'; // Skipped
+      }
+
+      await this.fetchCurrencies();
+      setTimeout(() => {
+        this.closeModal();
+      }, 1000);
+      this.formLoading = false;
     }
   },
   mounted() {
