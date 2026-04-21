@@ -19,6 +19,9 @@
 @import './badges';
 @import './sidebar';
 
+// Utilities
+@import './utilities';
+
 // Layout & Core (Imported late to allow component-specific overrides)
 @import './layout';
 

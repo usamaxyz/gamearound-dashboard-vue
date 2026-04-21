@@ -170,13 +170,16 @@
                     </button>
                   </div>
                   <div class="upload-controls">
-                    <label v-if="imageMode === 'upload'" class="btn-secondary btn-sm upload-trigger"
-                      :class="{ 'disabled': !form.id || uploadingImage }">
-                      <Upload :size="16" />
-                      <span>{{ uploadingImage ? 'Uploading...' : 'Choose Image' }}</span>
-                      <input type="file" @change="e => handleUpload(e, 'imageUrl', 'UI/Currency')" accept="image/*"
-                        hidden />
-                    </label>
+                    <template v-if="imageMode === 'upload'">
+                      <button type="button" class="btn btn-secondary btn-sm"
+                        :disabled="!form.id || uploadingImage" title="Upload Image" @click="$refs.imageInput.click()">
+                        <RefreshCw v-if="uploadingImage" class="spinning" :size="16" />
+                        <Upload v-else :size="16" />
+                        <span>{{ uploadingImage ? 'Uploading...' : 'Choose Image' }}</span>
+                      </button>
+                      <input type="file" ref="imageInput" @change="e => handleUpload(e, 'imageUrl', 'UI/Currency')" accept="image/*" hidden />
+                    </template>
+                    
                     <div v-else class="input-wrapper url-input-field">
                       <input v-model="form.imageUrl" type="text" placeholder="Enter Image URL" />
                     </div>
@@ -210,13 +213,16 @@
                     </button>
                   </div>
                   <div class="upload-controls">
-                    <label v-if="assetMode === 'upload'" class="btn-secondary btn-sm upload-trigger"
-                      :class="{ 'disabled': !form.id || uploadingAsset }">
-                      <Upload :size="16" />
-                      <span>{{ uploadingAsset ? 'Uploading...' : 'Choose Asset' }}</span>
-                      <input type="file" @change="e => handleUpload(e, 'assetUrl', 'UI/Currency')" accept=".asset"
-                        hidden />
-                    </label>
+                    <template v-if="assetMode === 'upload'">
+                      <button type="button" class="btn btn-secondary btn-sm"
+                        :disabled="!form.id || uploadingAsset" title="Upload Asset" @click="$refs.assetInput.click()">
+                        <RefreshCw v-if="uploadingAsset" class="spinning" :size="16" />
+                        <Upload v-else :size="16" />
+                        <span>{{ uploadingAsset ? 'Uploading...' : 'Choose Asset' }}</span>
+                      </button>
+                      <input type="file" ref="assetInput" @change="e => handleUpload(e, 'assetUrl', 'UI/Currency')" accept=".asset" hidden />
+                    </template>
+                    
                     <div v-else class="input-wrapper url-input-field">
                       <input v-model="form.assetUrl" type="text" placeholder="Enter Asset URL" />
                     </div>

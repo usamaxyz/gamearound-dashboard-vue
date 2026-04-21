@@ -37,6 +37,18 @@
     gap: 0.4rem;
     border-radius: var(--radius-sm);
   }
+
+  &.btn-icon {
+    padding: 0.5rem;
+    aspect-ratio: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    
+    &.btn-sm {
+      padding: 0.4rem;
+    }
+  }
 }
 
 .btn-primary {
