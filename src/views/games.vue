@@ -28,7 +28,7 @@
     <div class="filters-bar">
       <div class="search-wrapper">
         <Search class="search-icon" :size="20" />
-        <input v-model="searchQuery" type="text" placeholder="Search games..." @input="handleSearch" />
+        <input v-model="searchQuery" type="text" placeholder="Search..." @input="handleSearch" />
       </div>
       <button @click="fetchGames" class="btn-ghost" :disabled="loading" title="Refresh">
         <RefreshCw :class="{ 'spinning': loading }" :size="20" />

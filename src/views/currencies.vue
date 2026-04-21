@@ -20,7 +20,7 @@
       <div class="filters-bar">
         <div class="search-wrapper">
           <Search class="search-icon" :size="20" />
-          <input v-model="searchQuery" type="text" placeholder="Search currencies..." @input="handleSearch" />
+          <input v-model="searchQuery" type="text" placeholder="Search..." @input="handleSearch" />
         </div>
         <button @click="fetchCurrencies" class="btn-ghost" :disabled="loading" title="Refresh">
           <RefreshCw :class="{ 'spinning': loading }" :size="20" />
@@ -181,6 +181,9 @@
                       <input v-model="form.imageUrl" type="text" placeholder="Enter Image URL" />
                     </div>
                   </div>
+                  <p v-if="imageMode === 'upload' && !form.id" class="input-hint">
+                    Please enter a Currency ID first to enable upload.
+                  </p>
                 </div>
               </div>
 
@@ -218,6 +221,9 @@
                       <input v-model="form.assetUrl" type="text" placeholder="Enter Asset URL" />
                     </div>
                   </div>
+                  <p v-if="assetMode === 'upload' && !form.id" class="input-hint">
+                    Please enter a Currency ID first to enable upload.
+                  </p>
                 </div>
               </div>
             </div>
@@ -352,9 +358,9 @@ export default {
     editCurrency(item) {
       this.editingItem = item;
       this.form = { ...item };
-      // Try to determine mode from existing value (if it's an S3 link from our bucket, default to upload)
-      this.imageMode = item.imageUrl?.includes('amazonaws.com') ? 'upload' : (item.imageUrl ? 'link' : 'upload');
-      this.assetMode = item.assetUrl?.includes('amazonaws.com') ? 'upload' : (item.assetUrl ? 'link' : 'upload');
+      // Force link mode in edit currency as requested
+      this.imageMode = 'link';
+      this.assetMode = 'link';
       this.showModal = true;
     },
     confirmDelete(item) {
