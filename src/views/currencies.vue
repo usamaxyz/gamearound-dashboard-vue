@@ -57,14 +57,14 @@
               </td>
               <td>
                 <div class="flex-gap-2">
-                  <a v-if="item.imageUrl" :href="item.imageUrl" target="_blank" class="hover-primary" title="View Image"
+                  <button v-if="item.imageUrl" @click="previewAsset(item, 'image')" class="btn-ghost" title="View Image"
                     style="color: var(--text-muted)">
                     <Image :size="16" />
-                  </a>
-                  <a v-if="item.assetUrl" :href="item.assetUrl" target="_blank" class="hover-primary" title="View Model"
+                  </button>
+                  <button v-if="item.assetUrl" @click="previewAsset(item, 'asset')" class="btn-ghost" title="View Model"
                     style="color: var(--text-muted)">
                     <FileCode :size="16" />
-                  </a>
+                  </button>
                 </div>
               </td>
               <td>
@@ -162,7 +162,7 @@
                 <div class="upload-container">
                   <!-- Preview for already uploaded or selected file -->
                   <div v-if="(form.imageUrl || form.imageFile) && imageMode === 'upload'" class="upload-preview">
-                    <img :src="form.imageFile ? getFilePreview(form.imageFile) : form.imageUrl" alt="Preview" />
+                    <img :src="form.imageFile ? getFilePreview(form.imageFile) : getCloudFrontUrl(form.imageUrl)" alt="Preview" />
                     <button type="button" @click="clearFile('image')" class="remove-btn">
                       <X :size="14" />
                     </button>
@@ -295,24 +295,35 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Image Preview Modal -->
+    <ImageModal 
+      :is-open="!!assetToPreview" 
+      :asset-url="getCloudFrontUrl(previewUrl)" 
+      :title="assetToPreview?.name"
+      :is-image="previewType === 'image'"
+      @close="assetToPreview = null"
+    />
   </div>
 </template>
 
 <script>
-import api from '@/services/api';
+import api, { getCloudFrontUrl } from '@/services/api';
 import axios from 'axios';
 import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
 import GameSelector from '@/components/GameSelector.vue';
+import ImageModal from '@/components/ImageModal.vue';
 import {
-  Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle
+  Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle, ExternalLink
 } from 'lucide-vue-next';
 
 export default {
   name: 'CurrenciesView',
   components: {
     GameSelector,
-    Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle
+    ImageModal,
+    Coins, Search, RefreshCw, Edit2, Trash2, X, Plus, Activity, Layout, Code, Upload, Image, FileCode, Gamepad2, CheckCircle2, Circle, ExternalLink
   },
   setup() {
     const gamesStore = useGamesStore();
@@ -327,6 +338,8 @@ export default {
       showModal: false,
       editingItem: null,
       itemToDelete: null,
+      assetToPreview: null,
+      previewType: 'image', // 'image' or 'asset'
       formLoading: false,
       uploadingImage: false,
       uploadingAsset: false,
@@ -358,6 +371,10 @@ export default {
         c.name?.toLowerCase().includes(q) ||
         c.id?.toLowerCase().includes(q)
       );
+    },
+    previewUrl() {
+      if (!this.assetToPreview) return '';
+      return this.previewType === 'image' ? this.assetToPreview.imageUrl : this.assetToPreview.assetUrl;
     }
   },
   watch: {
@@ -370,6 +387,7 @@ export default {
     }
   },
   methods: {
+    getCloudFrontUrl,
     async fetchCurrencies() {
       if (!this.selectedGameId) return;
       this.loading = true;
@@ -428,6 +446,10 @@ export default {
       } finally {
         this.formLoading = false;
       }
+    },
+    previewAsset(item, type) {
+      this.previewType = type;
+      this.assetToPreview = item;
     },
     closeModal() {
       this.showModal = false;

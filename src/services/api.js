@@ -27,4 +27,26 @@ api.interceptors.request.use(async (config) => {
     return Promise.reject(error);
 });
 
+export const CLOUDFRONT_URL = 'https://du1ui0vdk1uj4.cloudfront.net';
+
+export const getCloudFrontUrl = (url) => {
+    if (!url) return '';
+    // If it's already a cloudfront URL or doesn't look like an S3 URL, return as is
+    if (url.includes('cloudfront.net') || !url.includes('s3')) return url;
+    
+    // Convert S3 URL to CloudFront URL
+    // Format: https://bucket.s3.region.amazonaws.com/path/to/file
+    try {
+        const s3Pattern = /\.s3\.[a-z0-9-]+\.amazonaws\.com\//;
+        const parts = url.split(s3Pattern);
+        if (parts.length > 1) {
+            return `${CLOUDFRONT_URL}/${parts[1]}`;
+        }
+    } catch (e) {
+        console.warn('Failed to parse URL for CloudFront:', url);
+    }
+    
+    return url;
+};
+
 export default api;
