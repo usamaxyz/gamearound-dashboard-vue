@@ -2,7 +2,7 @@
   <div class="json-template-form-page fadeIn">
     <div class="page-header">
       <div class="header-content">
-        <button @click="$router.push({ name: 'json-templates' })" class="btn-ghost mb-5">
+        <button @click="$router.push({ name: 'json-templates' })" class="btn-ghost mb-5" style="width: fit-content;">
           <ChevronLeft :size="20" />
           <span>Back to Templates</span>
         </button>
@@ -137,9 +137,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.dashed {
-  border-style: dashed;
-}
-</style>

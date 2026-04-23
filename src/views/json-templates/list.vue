@@ -12,9 +12,9 @@
     </div>
 
     <!-- Main Content -->
-    <div class="table-wrapper mt-4">
+    <template v-if="templates">
       <!-- Filters -->
-      <div class="filters-bar">
+      <div class="filters-bar mt-4">
         <div class="search-wrapper">
           <Search class="search-icon" :size="20" />
           <input v-model="searchQuery" type="text" placeholder="Search templates..." @input="handleSearch" />
@@ -24,7 +24,8 @@
         </button>
       </div>
 
-      <table v-if="filteredTemplates.length > 0" class="data-table">
+      <div class="table-wrapper">
+        <table v-if="filteredTemplates.length > 0" class="data-table">
         <thead>
           <tr>
             <th>Template Name</th>
@@ -75,6 +76,7 @@
         <p>Start by creating a new JSON template.</p>
       </div>
     </div>
+    </template>
 
     <!-- Delete Confirmation Modal -->
     <Teleport to="body">
@@ -167,7 +169,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Scoped styles can be removed or kept minimal as global utilities are used */
-</style>

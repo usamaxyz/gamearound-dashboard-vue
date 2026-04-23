@@ -373,3 +373,61 @@
     color: var(--text-muted);
   }
 }
+
+// --- JSON Builder Styles ---
+.json-builder {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.value-editor {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  margin-bottom: 4px;
+}
+.value-editor.nested {
+  border-left: 2px solid var(--primary);
+  margin-left: 12px;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 0;
+  background: transparent;
+}
+.editor-header {
+  padding: 8px;
+}
+.value-editor.nested > .editor-header {
+  padding: 4px 0;
+}
+.editor-body {
+  padding-left: 24px;
+  padding-bottom: 8px;
+}
+.field-name {
+  min-width: 150px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.attribute-editor {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+.attribute-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.border-left {
+  border-left: 2px solid var(--border);
+}
+
+.dashed {
+  border-style: dashed !important;
+}

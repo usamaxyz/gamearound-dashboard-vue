@@ -166,20 +166,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.attribute-editor {
-  background: var(--surface-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-}
-.attribute-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.border-left {
-  border-left: 2px solid var(--border-color);
-}
-</style>

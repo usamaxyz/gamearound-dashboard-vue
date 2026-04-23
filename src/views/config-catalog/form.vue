@@ -2,7 +2,7 @@
   <div class="catalog-form-page fadeIn">
     <div class="page-header">
       <div class="header-content">
-        <button @click="$router.push({ name: 'config-catalog' })" class="btn-ghost mb-5">
+        <button @click="$router.push({ name: 'config-catalog' })" class="btn-ghost mb-5" style="width: fit-content;">
           <ChevronLeft :size="20" />
           <span>Back to Catalog</span>
         </button>

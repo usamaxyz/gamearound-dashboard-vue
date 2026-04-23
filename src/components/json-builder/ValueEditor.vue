@@ -10,10 +10,19 @@
         <div v-else style="width: 24px;"></div> <!-- placeholder for alignment -->
 
         <!-- Name / Key -->
-        <div class="field-name" :class="{ 'text-muted': isCustom }">
-          <span v-if="name !== null">{{ name }}</span>
-          <span v-else class="text-muted fst-italic">Item</span>
-          <span v-if="isCustom" class="badge bg-secondary ml-2 fs-xs">Custom</span>
+        <div class="field-name d-flex align-items-center" :class="{ 'text-muted': isCustom }">
+          <span v-if="name !== null && !isCustom" class="fw-medium text-nowrap" style="margin-right: 8px;">{{ name }}</span>
+          <input 
+             v-else-if="isCustom" 
+             :value="name" 
+             @change="renameCustomKey($event.target.value)" 
+             class="custom-key-input"
+             style="background: transparent; border: 1px dashed var(--border); color: var(--text-main); width: 100px; margin-right: 8px; padding: 2px 4px;"
+             title="Rename custom attribute"
+          />
+          <span v-else class="text-muted fst-italic text-nowrap" style="margin-right: 8px;" title="Array items use numbered indices, not names">Item {{ index !== undefined ? index + 1 : '' }}</span>
+          
+          <span v-if="isCustom" class="badge bg-secondary ms-2 fs-xs" title="This attribute is manually added and not part of the template">Custom</span>
         </div>
 
         <!-- Value Input for Primitives -->
@@ -69,6 +78,7 @@
             :can-remove="true"
             @update:modelValue="updateObjectKey(key, $event)"
             @remove="removeObjectKey(key)"
+            @rename-key="renameObjectKey(key, $event)"
           />
         </div>
         <div class="mt-2 pl-4">
@@ -103,7 +113,8 @@
             v-for="(item, index) in arrayItems"
             :key="index"
             :schema="schema?.items"
-            :name="`Item ${index + 1}`"
+            :name="null"
+            :index="index"
             :model-value="item"
             :depth="depth + 1"
             :can-remove="true"
@@ -155,6 +166,10 @@ export default {
     canRemove: {
       type: Boolean,
       default: false
+    },
+    index: {
+      type: Number,
+      default: undefined
     }
   },
   data() {
@@ -210,6 +225,18 @@ export default {
       const newObj = { ...(this.modelValue || {}) };
       delete newObj[key];
       this.updateValue(newObj);
+    },
+    renameObjectKey(oldKey, newKey) {
+      if (!newKey || oldKey === newKey) return;
+      const newObj = { ...(this.modelValue || {}) };
+      newObj[newKey] = newObj[oldKey];
+      delete newObj[oldKey];
+      this.updateValue(newObj);
+    },
+    renameCustomKey(newKey) {
+      if (newKey && newKey !== this.name) {
+         this.$emit('rename-key', newKey);
+      }
     },
     addCustomProperty() {
       if (!this.newCustomKey) return;
@@ -272,36 +299,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.value-editor {
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--surface-bg);
-  margin-bottom: 4px;
-}
-.value-editor.nested {
-  border-left: 2px solid var(--primary-color);
-  margin-left: 12px;
-  border-top: none;
-  border-right: none;
-  border-bottom: none;
-  border-radius: 0;
-  background: transparent;
-}
-.editor-header {
-  padding: 8px;
-}
-.value-editor.nested > .editor-header {
-  padding: 4px 0;
-}
-.editor-body {
-  padding-left: 24px;
-  padding-bottom: 8px;
-}
-.field-name {
-  min-width: 150px;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-</style>

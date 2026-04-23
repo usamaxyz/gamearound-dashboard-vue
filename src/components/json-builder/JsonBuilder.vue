@@ -188,15 +188,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.json-builder {
-  background: var(--surface-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-}
-.font-mono {
-  font-family: monospace;
-}
-</style>
