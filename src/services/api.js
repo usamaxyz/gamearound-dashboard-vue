@@ -49,4 +49,9 @@ export const getCloudFrontUrl = (url) => {
     return url;
 };
 
+export const isImageFile = (url) => {
+    if (!url) return false;
+    return /\.(jpg|jpeg|png|gif|webp|svg|bmp)$/i.test(url);
+};
+
 export default api;

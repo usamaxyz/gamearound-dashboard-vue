@@ -301,14 +301,14 @@
       :is-open="!!assetToPreview" 
       :asset-url="getCloudFrontUrl(previewUrl)" 
       :title="assetToPreview?.name"
-      :is-image="previewType === 'image'"
+      :is-image="isImageFile(previewUrl)"
       @close="assetToPreview = null"
     />
   </div>
 </template>
 
 <script>
-import api, { getCloudFrontUrl } from '@/services/api';
+import api, { getCloudFrontUrl, isImageFile } from '@/services/api';
 import axios from 'axios';
 import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
@@ -388,6 +388,7 @@ export default {
   },
   methods: {
     getCloudFrontUrl,
+    isImageFile,
     async fetchCurrencies() {
       if (!this.selectedGameId) return;
       this.loading = true;

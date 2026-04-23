@@ -130,12 +130,12 @@
 
     <!-- Image Preview Modal -->
     <ImageModal :is-open="!!assetToPreview" :asset-url="getCloudFrontUrl(previewUrl)" :title="assetToPreview?.name"
-      :is-image="previewType === 'image'" @close="assetToPreview = null" />
+      :is-image="isImageFile(previewUrl)" @close="assetToPreview = null" />
   </div>
 </template>
 
 <script>
-import api, { getCloudFrontUrl } from '@/services/api';
+import api, { getCloudFrontUrl, isImageFile } from '@/services/api';
 import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
 import GameSelector from '@/components/GameSelector.vue';
@@ -193,6 +193,7 @@ export default {
   },
   methods: {
     getCloudFrontUrl,
+    isImageFile,
     async fetchCatalog() {
       if (!this.selectedGameId) return;
       this.loading = true;
