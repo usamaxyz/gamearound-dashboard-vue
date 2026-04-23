@@ -56,6 +56,24 @@ export default [
         meta: { auth: true, permission: 'manage_config_catalog' }
     },
     {
+        path: '/json-templates',
+        name: 'json-templates',
+        component: () => import('../views/json-templates/list.vue'),
+        meta: { auth: true, permission: 'manage_json_templates' }
+    },
+    {
+        path: '/json-templates/create',
+        name: 'json-templates-create',
+        component: () => import('../views/json-templates/form.vue'),
+        meta: { auth: true, permission: 'manage_json_templates' }
+    },
+    {
+        path: '/json-templates/edit/:templateId',
+        name: 'json-templates-edit',
+        component: () => import('../views/json-templates/form.vue'),
+        meta: { auth: true, permission: 'manage_json_templates' }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../views/not_found.vue'),

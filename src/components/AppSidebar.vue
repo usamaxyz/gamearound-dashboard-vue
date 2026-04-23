@@ -73,6 +73,12 @@ export default {
           icon: 'Info',
           show: this.authStore.hasPermission('manage_config_catalog')
         },
+        { 
+          name: 'JSON Templates', 
+          to: '/json-templates', 
+          icon: 'Info', // Will use a proper icon like FileJson later, but reusing Info for now or maybe FileCode
+          show: this.authStore.hasPermission('manage_json_templates')
+        },
         {
           name: 'Management',
           icon: 'Building2',

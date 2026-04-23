@@ -194,17 +194,21 @@
 
           <!-- Row 7: JSON Fields -->
           <div class="form-group span-2">
-            <label>Bundle (JSON)</label>
-            <div class="input-wrapper">
-              <textarea v-model="form.bundle" rows="5" class="font-mono"></textarea>
-            </div>
+            <JsonBuilder
+              v-model="form.bundle"
+              :templates="jsonTemplates"
+              label="Bundle Data"
+              description="Select a template or manually build the bundle JSON object."
+            />
           </div>
 
           <div class="form-group span-2">
-            <label>Payload (JSON)</label>
-            <div class="input-wrapper">
-              <textarea v-model="form.payload" rows="10" class="font-mono"></textarea>
-            </div>
+            <JsonBuilder
+              v-model="form.payload"
+              :templates="jsonTemplates"
+              label="Payload Data"
+              description="Select a template or manually build the payload JSON object."
+            />
           </div>
         </div>
 
@@ -262,11 +266,12 @@ import { storeToRefs } from 'pinia';
 import {
   ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown
 } from 'lucide-vue-next';
+import JsonBuilder from '@/components/json-builder/JsonBuilder.vue';
 
 export default {
   name: 'ConfigCatalogForm',
   components: {
-    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown
+    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown, JsonBuilder
   },
   setup() {
     const gamesStore = useGamesStore();
@@ -286,6 +291,7 @@ export default {
         asset: 'pending'
       },
       currencies: [],
+      jsonTemplates: [],
       form: {
         itemid: '',
         category: '',
@@ -322,6 +328,8 @@ export default {
       this.isEdit = true;
       this.fetchItem();
     }
+    
+    this.fetchTemplates();
   },
   watch: {
     selectedGameId() {
@@ -341,6 +349,14 @@ export default {
         this.currencies = res.data.currencies || [];
       } catch (err) {
         console.error('Failed to fetch currencies:', err);
+      }
+    },
+    async fetchTemplates() {
+      try {
+        const res = await api.get('/json-templates');
+        this.jsonTemplates = res.data.templates || [];
+      } catch (err) {
+        console.error('Failed to fetch json templates:', err);
       }
     },
     async fetchItem() {
