@@ -2,18 +2,12 @@
   <div class="catalog-form-page fadeIn">
     <div class="page-header">
       <div class="header-content">
-        <button @click="$router.push({ name: 'config-catalog' })" class="btn-ghost mb-2">
+        <button @click="$router.push({ name: 'config-catalog' })" class="btn-ghost mb-5">
           <ChevronLeft :size="20" />
           <span>Back to Catalog</span>
         </button>
         <h1>{{ isEdit ? 'Edit Item' : 'Add New Item' }}</h1>
         <p>Game: <strong>{{ selectedGame?.name }}</strong></p>
-      </div>
-      <div class="header-actions">
-        <button @click="saveItem" class="btn-primary" :disabled="formLoading">
-          <span v-if="!formLoading">{{ isEdit ? 'Save Changes' : 'Create Item' }}</span>
-          <RefreshCw v-else class="spinning" :size="18" />
-        </button>
       </div>
     </div>
 
@@ -23,8 +17,8 @@
       <p>Please select a game from the list to continue.</p>
     </div>
 
-    <div v-else class="form-container">
-      <div class="card p-4">
+    <div v-else class="mx-auto" style="max-width: 900px; padding: 4rem 0 8rem">
+      <div class="card bg-surface border rounded-lg" style="padding: 3rem">
         <div class="form-grid gap-lg">
           <!-- Row 1: Item ID & Category -->
           <div class="form-group">
@@ -97,20 +91,18 @@
           </div>
 
           <!-- Row 5: Toggles -->
-          <div class="form-group span-2">
-            <div class="d-flex gap-4 mt-2">
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="form.stackable" true-value="true" false-value="false" />
+          <div class="span-2">
+            <label class="form-label">Attributes</label>
+            <div class="pill-selection-grid">
+              <div class="selection-pill" :class="{ 'active': form.stackable === 'true' }" @click="form.stackable = form.stackable === 'true' ? 'false' : 'true'">
                 <span>Stackable</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="form.tradable" true-value="true" false-value="false" />
+              </div>
+              <div class="selection-pill" :class="{ 'active': form.tradable === 'true' }" @click="form.tradable = form.tradable === 'true' ? 'false' : 'true'">
                 <span>Tradable</span>
-              </label>
-              <label class="checkbox-item">
-                <input type="checkbox" v-model="form.inAppPurchase" true-value="true" false-value="false" />
+              </div>
+              <div class="selection-pill" :class="{ 'active': form.inAppPurchase === 'true' }" @click="form.inAppPurchase = form.inAppPurchase === 'true' ? 'false' : 'true'">
                 <span>In-App Purchase</span>
-              </label>
+              </div>
             </div>
           </div>
 
@@ -119,7 +111,7 @@
           <!-- Row 6: Assets -->
           <div class="form-group">
             <label>Image Asset</label>
-            <div class="radio-group mb-2">
+            <div class="radio-group">
               <label class="radio-item">
                 <input type="radio" v-model="imageMode" value="upload" />
                 <span>Upload</span>
@@ -157,7 +149,7 @@
 
           <div class="form-group">
             <label>3D Asset</label>
-            <div class="radio-group mb-2">
+            <div class="radio-group">
               <label class="radio-item">
                 <input type="radio" v-model="assetMode" value="upload" />
                 <span>Upload</span>
@@ -244,7 +236,7 @@
           </div>
         </div>
 
-        <div class="form-actions mt-4 d-flex justify-content-end gap-3">
+        <div class="mt-4 d-flex justify-content-end gap-3">
           <button type="button" @click="$router.push({ name: 'config-catalog' })" class="btn-secondary"
             :disabled="formLoading">Cancel</button>
           <button @click="saveItem" class="btn-primary" :disabled="formLoading">
@@ -448,26 +440,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.catalog-form-page {
-  padding-bottom: 4rem;
-}
-
-.form-container {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.checkbox-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.font-mono {
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
-  font-size: 0.85rem;
-}
-</style>

@@ -36,15 +36,30 @@
   padding-bottom: var(--space-3) !important;
 }
 
-.mb-4 {
-  margin-bottom: var(--space-4) !important;
-}
+.m-0 { margin: 0 !important; }
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: var(--space-1) !important; }
+.mb-2 { margin-bottom: var(--space-2) !important; }
+.mb-3 { margin-bottom: var(--space-3) !important; }
+.mb-4 { margin-bottom: var(--space-4) !important; }
+.mb-5 { margin-bottom: 2rem !important; }
+.mb-6 { margin-bottom: var(--space-6) !important; }
+.mb-8 { margin-bottom: var(--space-8) !important; }
 
-.mb-6 {
-  margin-bottom: var(--space-6) !important;
-}
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: var(--space-1) !important; }
+.mt-2 { margin-top: var(--space-2) !important; }
+.mt-3 { margin-top: var(--space-3) !important; }
+.mt-4 { margin-top: var(--space-4) !important; }
+.mt-6 { margin-top: var(--space-6) !important; }
+.mt-8 { margin-top: var(--space-8) !important; }
+
+.me-2 { margin-right: var(--space-2) !important; }
+.ms-2 { margin-left: var(--space-2) !important; }
 
 // Appearance
+.bg-deep { background: var(--bg-deep) !important; }
+.bg-surface { background: var(--bg-surface) !important; }
 .bg-card {
   background: var(--bg-card) !important;
 }
@@ -56,6 +71,7 @@
 .rounded-md {
   border-radius: var(--radius-md) !important;
 }
+.rounded-lg { border-radius: var(--radius-lg) !important; }
 
 // Typography
 .text-muted-util {

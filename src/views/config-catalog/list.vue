@@ -5,11 +5,11 @@
         <h1>Config Catalog</h1>
         <p>Manage game items, assets, and configurations.</p>
       </div>
-      <router-link :to="{ name: 'config-catalog-add' }" class="btn-primary" :disabled="!selectedGameId"
-        :class="{ 'disabled': !selectedGameId }">
-        <Plus :size="20" />
-        <span>Add Item</span>
-      </router-link>
+      <router-link :to="{ name: 'config-catalog-add' }" class="btn-primary" 
+        :style="{ opacity: !selectedGameId ? 0.6 : 1, pointerEvents: !selectedGameId ? 'none' : 'auto' }">
+         <Plus :size="20" />
+         <span>Add Item</span>
+       </router-link>
     </div>
 
     <!-- Game Selector -->
@@ -52,9 +52,9 @@
               </td>
               <td><code class="badge">{{ item.category }}</code></td>
               <td>
-                <div class="price-info">
+                <div class="d-flex flex-column">
                   <span class="text-mono">{{ item.price || 0 }}</span>
-                  <span class="currency-label">{{ item.currency }}</span>
+                  <span class="fs-sm text-muted-util">{{ item.currency }}</span>
                 </div>
               </td>
               <td>
@@ -237,20 +237,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.price-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.currency-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-</style>
