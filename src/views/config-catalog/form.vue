@@ -17,14 +17,14 @@
       <p>Please select a game from the list to continue.</p>
     </div>
 
-    <div v-else class="mx-auto" style="max-width: 900px; padding: 4rem 0 8rem">
-      <div class="card bg-surface border rounded-lg" style="padding: 3rem">
+    <div v-else class="w-form py-form">
+      <div class="card bg-surface border rounded-lg p-form">
         <div class="form-grid gap-lg">
           <!-- Row 1: Item ID & Category -->
           <div class="form-group">
             <label>Item ID *</label>
             <div class="input-wrapper">
-              <input v-model="form.itemid" type="text" placeholder="e.g. DeggsyKart" :disabled="isEdit" required />
+              <input v-model="form.itemid" type="text" :disabled="isEdit" required />
             </div>
             <p class="input-hint">Unique identifier for the item.</p>
           </div>
@@ -32,7 +32,7 @@
           <div class="form-group">
             <label>Category *</label>
             <div class="input-wrapper">
-              <input v-model="form.category" type="text" placeholder="e.g. Kart" :disabled="isEdit" required />
+              <input v-model="form.category" type="text" :disabled="isEdit" required />
             </div>
             <p class="input-hint">Partition key for the catalog.</p>
           </div>
@@ -41,14 +41,14 @@
           <div class="form-group span-2">
             <label>Name *</label>
             <div class="input-wrapper">
-              <input v-model="form.name" type="text" placeholder="e.g. Deggsy's Banana Rocket Kart" required />
+              <input v-model="form.name" type="text" required />
             </div>
           </div>
 
           <div class="form-group span-2">
             <label>Description</label>
             <div class="input-wrapper">
-              <textarea v-model="form.description" rows="3" placeholder="Describe the item..."></textarea>
+              <textarea v-model="form.description" rows="3"></textarea>
             </div>
           </div>
 
@@ -62,8 +62,14 @@
 
           <div class="form-group">
             <label>Currency</label>
-            <div class="input-wrapper">
-              <input v-model="form.currency" type="text" placeholder="e.g. GC" />
+            <div class="custom-select-wrapper">
+              <select v-model="form.currency">
+                <option value="">Select Currency</option>
+                <option v-for="curr in currencies" :key="curr.id" :value="curr.id">
+                  {{ curr.name }}
+                </option>
+              </select>
+              <ChevronDown class="select-icon" :size="16" />
             </div>
           </div>
 
@@ -92,7 +98,6 @@
 
           <!-- Row 5: Toggles -->
           <div class="span-2">
-            <label class="form-label">Attributes</label>
             <div class="pill-selection-grid">
               <div class="selection-pill" :class="{ 'active': form.stackable === 'true' }" @click="form.stackable = form.stackable === 'true' ? 'false' : 'true'">
                 <span>Stackable</span>
@@ -191,14 +196,14 @@
           <div class="form-group span-2">
             <label>Bundle (JSON)</label>
             <div class="input-wrapper">
-              <textarea v-model="form.bundle" rows="5" placeholder="{}" class="font-mono"></textarea>
+              <textarea v-model="form.bundle" rows="5" class="font-mono"></textarea>
             </div>
           </div>
 
           <div class="form-group span-2">
             <label>Payload (JSON)</label>
             <div class="input-wrapper">
-              <textarea v-model="form.payload" rows="10" placeholder="{}" class="font-mono"></textarea>
+              <textarea v-model="form.payload" rows="10" class="font-mono"></textarea>
             </div>
           </div>
         </div>
@@ -255,13 +260,13 @@ import axios from 'axios';
 import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
 import {
-  ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode
+  ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown
 } from 'lucide-vue-next';
 
 export default {
   name: 'ConfigCatalogForm',
   components: {
-    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode
+    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown
   },
   setup() {
     const gamesStore = useGamesStore();
@@ -280,6 +285,7 @@ export default {
         image: 'pending',
         asset: 'pending'
       },
+      currencies: [],
       form: {
         itemid: '',
         category: '',
@@ -295,21 +301,48 @@ export default {
         inAppPurchase: 'false',
         imageUrl: '',
         assetId: '',
-        bundle: '{}',
-        payload: '{}',
+        bundle: '',
+        payload: '',
         imageFile: null,
         assetFile: null
       }
     };
   },
   async mounted() {
+    const gamesStore = useGamesStore();
+    if (gamesStore.games.length === 0) {
+      await gamesStore.fetchGames();
+    }
+
+    if (this.selectedGameId) {
+      this.fetchCurrencies();
+    }
+
     if (this.$route.params.itemid) {
       this.isEdit = true;
       this.fetchItem();
     }
   },
+  watch: {
+    selectedGameId() {
+      if (this.selectedGameId) {
+        this.fetchCurrencies();
+      } else {
+        this.currencies = [];
+      }
+    }
+  },
   methods: {
     getCloudFrontUrl,
+    async fetchCurrencies() {
+      if (!this.selectedGameId) return;
+      try {
+        const res = await api.get(`/currencies/${this.selectedGameId}`);
+        this.currencies = res.data.currencies || [];
+      } catch (err) {
+        console.error('Failed to fetch currencies:', err);
+      }
+    },
     async fetchItem() {
       if (!this.selectedGameId) return;
       this.formLoading = true;

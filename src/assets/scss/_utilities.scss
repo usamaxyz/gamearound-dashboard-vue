@@ -1,12 +1,22 @@
 /* Utility Classes (Bootstrap-style) */
 
 // Display & Flex
-.d-flex {
-  display: flex !important;
-}
+.d-flex { display: flex !important; }
+.d-grid { display: grid !important; }
+.align-items-center { align-items: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.justify-content-center { justify-content: center !important; }
+.justify-content-end { justify-content: flex-end !important; }
+.flex-column { flex-direction: column !important; }
+.flex-wrap { flex-wrap: wrap !important; }
 
-.align-items-center {
-  align-items: center !important;
+// --- Dividers ---
+hr {
+  border: none;
+  height: 1px;
+  background: var(--border-bright);
+  margin: var(--space-6) 0;
+  opacity: 0.5;
 }
 
 // Spacing
@@ -56,6 +66,10 @@
 
 .me-2 { margin-right: var(--space-2) !important; }
 .ms-2 { margin-left: var(--space-2) !important; }
+
+.w-form { max-width: 900px !important; margin-left: auto !important; margin-right: auto !important; }
+.p-form { padding: 3rem !important; }
+.py-form { padding-bottom: 8rem !important; }
 
 // Appearance
 .bg-deep { background: var(--bg-deep) !important; }

@@ -258,44 +258,6 @@
   }
 }
 
-// --- Generic Form Check (Checkboxes & Radios) ---
-.form-check {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem; // Precise space between input and label
-  cursor: pointer;
-  margin-bottom: 0;
-  transition: color var(--transition-fast);
-
-  input[type="checkbox"],
-  input[type="radio"] {
-    margin: 0;
-    cursor: pointer;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-
-  .form-check-label {
-    font-size: 0.9375rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    text-transform: none; // Reset uppercase from standard labels
-    letter-spacing: normal;
-    margin-bottom: 0;
-    cursor: pointer;
-  }
-
-  &:hover .form-check-label {
-    color: var(--text-main);
-  }
-}
-
-.form-check-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-6);
-}
 
 // --- Professional Upload Container ---
 .upload-container {
