@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useAppStore = defineStore('app', {
     state: () => ({
         app_name: 'Gamearound',
-        version: '1.0.3',
+        version: '1.0.4',
         permissions: ['admin', 'manage_users', 'manage_games', 'manage_currencies'],
     }),
 
