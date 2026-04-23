@@ -38,6 +38,24 @@ export default [
         meta: { auth: true, permission: 'manage_currencies' }
     },
     {
+        path: '/config-catalog',
+        name: 'config-catalog',
+        component: () => import('../views/config-catalog/list.vue'),
+        meta: { auth: true, permission: 'manage_config_catalog' }
+    },
+    {
+        path: '/config-catalog/add',
+        name: 'config-catalog-add',
+        component: () => import('../views/config-catalog/form.vue'),
+        meta: { auth: true, permission: 'manage_config_catalog' }
+    },
+    {
+        path: '/config-catalog/edit/:category/:itemid',
+        name: 'config-catalog-edit',
+        component: () => import('../views/config-catalog/form.vue'),
+        meta: { auth: true, permission: 'manage_config_catalog' }
+    },
+    {
         path: '/:pathMatch(.*)*',
         name: 'not-found',
         component: () => import('../views/not_found.vue'),

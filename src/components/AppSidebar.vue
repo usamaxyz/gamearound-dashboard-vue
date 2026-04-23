@@ -67,6 +67,12 @@ export default {
           icon: 'Coins',
           show: this.authStore.hasPermission('manage_currencies')
         },
+        { 
+          name: 'Config Catalog', 
+          to: '/config-catalog', 
+          icon: 'Info',
+          show: this.authStore.hasPermission('manage_config_catalog')
+        },
         {
           name: 'Management',
           icon: 'Building2',
