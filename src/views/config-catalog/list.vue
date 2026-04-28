@@ -72,6 +72,11 @@
               <td>
                 <div class="row-actions">
                   <router-link
+                    :to="{ name: 'config-catalog-add', query: { duplicateFromCategory: item.category, duplicateFromItemId: item.itemid } }"
+                    class="btn-ghost" title="Duplicate">
+                    <Copy :size="16" />
+                  </router-link>
+                  <router-link
                     :to="{ name: 'config-catalog-edit', params: { category: item.category, itemid: item.itemid } }"
                     class="btn-ghost edit" title="Edit">
                     <Edit2 :size="16" />
@@ -141,7 +146,7 @@ import { storeToRefs } from 'pinia';
 import GameSelector from '@/components/GameSelector.vue';
 import ImageModal from '@/components/ImageModal.vue';
 import {
-  Package, Search, RefreshCw, Edit2, Trash2, X, Plus, Image, FileCode, Gamepad2
+  Package, Search, RefreshCw, Edit2, Trash2, X, Plus, Image, FileCode, Gamepad2, Copy
 } from 'lucide-vue-next';
 
 export default {
@@ -149,7 +154,7 @@ export default {
   components: {
     GameSelector,
     ImageModal,
-    Package, Search, RefreshCw, Edit2, Trash2, X, Plus, Image, FileCode, Gamepad2
+    Package, Search, RefreshCw, Edit2, Trash2, X, Plus, Image, FileCode, Gamepad2, Copy
   },
   setup() {
     const gamesStore = useGamesStore();

@@ -327,6 +327,9 @@ export default {
     if (this.$route.params.itemid) {
       this.isEdit = true;
       this.fetchItem();
+    } else if (this.$route.query.duplicateFromItemId) {
+      this.isEdit = false;
+      this.fetchItem();
     }
     
     this.fetchTemplates();
@@ -366,13 +369,22 @@ export default {
         // Since list fetches all, we might find it in the list or fetch it specifically
         // For simplicity and correctness, fetch the game's catalog and find the item
         const res = await api.get(`/config-catalog/${this.selectedGameId}`);
+        const targetItemId = this.$route.params.itemid || this.$route.query.duplicateFromItemId;
+        const targetCategory = this.$route.params.category || this.$route.query.duplicateFromCategory;
+
         const item = res.data.items.find(i =>
-          i.itemid === this.$route.params.itemid &&
-          i.category === this.$route.params.category
+          i.itemid === targetItemId &&
+          i.category === targetCategory
         );
 
         if (item) {
           this.form = { ...item, imageFile: null, assetFile: null };
+          
+          if (this.$route.query.duplicateFromItemId) {
+            const randomSuffix = Math.floor(Math.random() * 100000);
+            this.form.itemid = `${this.form.itemid}-${randomSuffix}n`;
+          }
+
           this.imageMode = 'link';
           this.assetMode = 'link';
         } else {
