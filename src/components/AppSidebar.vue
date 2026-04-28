@@ -29,7 +29,8 @@ export default {
     LogOut
   },
   props: {
-    isOpen: Boolean
+    isOpen: Boolean,
+    isMobile: Boolean
   },
   setup() {
     const authStore = useAuthStore();
@@ -114,7 +115,7 @@ export default {
 </script>
 
 <template>
-  <aside class="sidebar" :class="{ 'collapsed': !isOpen }">
+  <aside class="sidebar" :class="{ 'collapsed': !isOpen, 'mobile-open': isMobile && isOpen }">
     <div class="sidebar-header">
       <div class="brand">
         <div class="logo-box">G</div>

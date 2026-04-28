@@ -64,7 +64,6 @@
         <thead>
           <tr>
             <th>User</th>
-            <th>Role</th>
             <th>Status</th>
             <th>Joined</th>
             <th style="text-align: right">Actions</th>
@@ -83,18 +82,7 @@
                 </div>
               </div>
             </td>
-            <td>
-              <div class="badge-group">
-                <span 
-                  v-for="role in user.permissions" 
-                  :key="role" 
-                  class="badge"
-                  :class="role"
-                >
-                  {{ role }}
-                </span>
-              </div>
-            </td>
+
             <td>
               <span class="status-pill" :class="user.status.toLowerCase()">
                 {{ user.status }}
@@ -105,6 +93,13 @@
             </td>
             <td>
               <div class="row-actions">
+                <button 
+                  @click="viewPermissions(user)" 
+                  class="btn-ghost" 
+                  title="View Permissions"
+                >
+                  <Shield :size="16" />
+                </button>
                 <button 
                   @click="editUser(user)" 
                   class="btn-ghost edit" 
@@ -231,6 +226,38 @@
         </div>
       </div>
     </Teleport>
+
+    <!-- Permissions View Modal -->
+    <Teleport to="body">
+      <div v-if="viewingPermissionsUser" class="modal-overlay" @click.self="viewingPermissionsUser = null">
+        <div class="modal-card">
+          <div class="modal-header">
+            <div class="header-content">
+              <h2>User Permissions</h2>
+              <p>Assigned access roles for <strong>{{ viewingPermissionsUser.name }}</strong></p>
+            </div>
+            <button @click="viewingPermissionsUser = null" class="btn-ghost"><X :size="20" /></button>
+          </div>
+          
+          <div class="permissions-view-content">
+            <div class="pill-selection-grid read-only">
+              <div 
+                v-for="role in viewingPermissionsUser.permissions" 
+                :key="role" 
+                class="selection-pill active"
+              >
+                <component :is="getRoleIcon(role)" :size="16" />
+                <span>{{ role }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="modal-actions">
+            <button @click="viewingPermissionsUser = null" class="btn-primary">Close</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -264,6 +291,7 @@ export default {
       showAddModal: false,
       editingUser: null,
       userToDelete: null,
+      viewingPermissionsUser: null,
       formLoading: false,
       form: {
         name: '',
@@ -341,6 +369,9 @@ export default {
       return new Date(dateStr).toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric'
       });
+    },
+    viewPermissions(user) {
+      this.viewingPermissionsUser = user;
     },
     editUser(user) {
       this.editingUser = user;

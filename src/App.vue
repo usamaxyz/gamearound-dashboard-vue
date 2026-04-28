@@ -4,10 +4,16 @@
   </div>
 
   <div v-else-if="authStore.isAuthenticated" class="dashboard-shell">
-    <AppSidebar :is-open="isSidebarOpen" />
+    <div 
+      v-if="isMobile && isSidebarOpen" 
+      class="sidebar-overlay" 
+      @click="isSidebarOpen = false"
+    ></div>
+
+    <AppSidebar :is-open="isSidebarOpen" :is-mobile="isMobile" />
 
     <main class="main-content" :class="{ 'sidebar-collapsed': !isSidebarOpen }">
-      <app_header @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+      <app_header @toggle-sidebar="toggleSidebar" />
 
       <div class="content-area">
         <RouterView />
@@ -37,11 +43,31 @@ export default {
   },
   data() {
     return {
-      isSidebarOpen: true
+      isSidebarOpen: window.innerWidth > 1024,
+      isMobile: window.innerWidth <= 1024
     };
+  },
+  watch: {
+    '$route'() {
+      if (this.isMobile && this.isSidebarOpen) {
+        this.isSidebarOpen = false;
+      }
+    }
+  },
+  methods: {
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+    },
+    handleResize() {
+      this.isMobile = window.innerWidth <= 1024;
+    }
   },
   async mounted() {
     await this.authStore.checkAuth();
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 };
 </script>

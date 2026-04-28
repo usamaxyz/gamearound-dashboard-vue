@@ -3,7 +3,7 @@
 .table-wrapper {
   @include premium-card(false);
   background: var(--bg-surface);
-  overflow: hidden;
+  overflow-x: auto;
   margin-top: var(--space-6);
 }
 
