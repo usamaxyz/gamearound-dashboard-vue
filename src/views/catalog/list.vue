@@ -2,10 +2,10 @@
   <div class="catalog-page fadeIn">
     <div class="page-header">
       <div class="header-content">
-        <h1>Config Catalog</h1>
+        <h1>Catalog</h1>
         <p>Manage game items, assets, and configurations.</p>
       </div>
-      <router-link :to="{ name: 'config-catalog-add' }" class="btn-primary" 
+      <router-link :to="{ name: 'catalog-add' }" class="btn-primary" 
         :style="{ opacity: !selectedGameId ? 0.6 : 1, pointerEvents: !selectedGameId ? 'none' : 'auto' }">
          <Plus :size="20" />
          <span>Add Item</span>
@@ -72,12 +72,12 @@
               <td>
                 <div class="row-actions">
                   <router-link
-                    :to="{ name: 'config-catalog-add', query: { duplicateFromCategory: item.category, duplicateFromItemId: item.itemid } }"
+                    :to="{ name: 'catalog-add', query: { duplicateFromCategory: item.category, duplicateFromItemId: item.itemid } }"
                     class="btn-ghost" title="Duplicate">
                     <Copy :size="16" />
                   </router-link>
                   <router-link
-                    :to="{ name: 'config-catalog-edit', params: { category: item.category, itemid: item.itemid } }"
+                    :to="{ name: 'catalog-edit', params: { itemid: item.itemid } }"
                     class="btn-ghost edit" title="Edit">
                     <Edit2 :size="16" />
                   </router-link>
@@ -150,7 +150,7 @@ import {
 } from 'lucide-vue-next';
 
 export default {
-  name: 'ConfigCatalogList',
+  name: 'CatalogList',
   components: {
     GameSelector,
     ImageModal,
@@ -203,7 +203,7 @@ export default {
       if (!this.selectedGameId) return;
       this.loading = true;
       try {
-        const res = await api.get(`/config-catalog/${this.selectedGameId}`);
+        const res = await api.get(`/catalog/${this.selectedGameId}`);
         this.items = res.data.items || [];
       } catch (err) {
         console.error('Failed to fetch catalog:', err);
@@ -221,7 +221,7 @@ export default {
       if (!this.itemToDelete) return;
       this.formLoading = true;
       try {
-        await api.delete(`/config-catalog/${this.selectedGameId}/${this.itemToDelete.category}/${this.itemToDelete.itemid}`);
+        await api.delete(`/catalog/${this.selectedGameId}/${this.itemToDelete.itemid}`);
         await this.fetchCatalog();
         this.itemToDelete = null;
       } catch (err) {

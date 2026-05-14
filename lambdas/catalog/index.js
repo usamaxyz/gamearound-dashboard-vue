@@ -12,7 +12,7 @@ const corsHeaders = {
 };
 
 export const handler = async (event) => {
-    console.log("Config Catalog Event:", JSON.stringify(event, null, 2));
+    console.log("Catalog Event:", JSON.stringify(event, null, 2));
 
     try {
         const authorizerClaims = event.requestContext?.authorizer?.claims;
@@ -27,42 +27,41 @@ export const handler = async (event) => {
             };
         }
 
-        // 1. RBAC Enforcement (manage_config_catalog)
+        // 1. RBAC Enforcement (manage_catalog)
         const userRes = await docClient.send(new GetCommand({
             TableName: "gadash_users",
             Key: { userId: requesterUserId }
         }));
 
         const permissions = userRes.Item?.permissions || [];
-        if (!permissions.includes("manage_config_catalog")) {
+        if (!permissions.includes("manage_catalog")) {
             return {
                 statusCode: 403,
                 headers: corsHeaders,
-                body: JSON.stringify({ message: "Forbidden: You do not have permission to manage config catalog" })
+                body: JSON.stringify({ message: "Forbidden: You do not have permission to manage catalog" })
             };
         }
 
         const method = event.httpMethod;
         const resource = event.resource;
         const gameIdParam = event.pathParameters?.gameId;
-        const categoryParam = event.pathParameters?.category;
         const itemIdParam = event.pathParameters?.itemId;
 
         // 2. Routing
-        if (method === "GET" && resource === "/config-catalog/{gameId}" && gameIdParam) {
+        if (method === "GET" && resource === "/catalog/{gameId}" && gameIdParam) {
             return await listCatalog(requesterCompanyId, gameIdParam);
         }
 
-        if (method === "POST" && resource === "/config-catalog/{gameId}" && gameIdParam) {
+        if (method === "POST" && resource === "/catalog/{gameId}" && gameIdParam) {
             return await createCatalogItem(requesterCompanyId, gameIdParam, JSON.parse(event.body || "{}"));
         }
 
-        if (method === "PATCH" && resource === "/config-catalog/{gameId}/{category}/{itemId}" && gameIdParam && categoryParam && itemIdParam) {
-            return await updateCatalogItem(requesterCompanyId, gameIdParam, categoryParam, itemIdParam, JSON.parse(event.body || "{}"));
+        if (method === "PATCH" && resource === "/catalog/{gameId}/{itemId}" && gameIdParam && itemIdParam) {
+            return await updateCatalogItem(requesterCompanyId, gameIdParam, itemIdParam, JSON.parse(event.body || "{}"));
         }
 
-        if (method === "DELETE" && resource === "/config-catalog/{gameId}/{category}/{itemId}" && gameIdParam && categoryParam && itemIdParam) {
-            return await deleteCatalogItem(requesterCompanyId, gameIdParam, categoryParam, itemIdParam);
+        if (method === "DELETE" && resource === "/catalog/{gameId}/{itemId}" && gameIdParam && itemIdParam) {
+            return await deleteCatalogItem(requesterCompanyId, gameIdParam, itemIdParam);
         }
 
         return {
@@ -72,7 +71,7 @@ export const handler = async (event) => {
         };
 
     } catch (err) {
-        console.error("Error in config catalog lambda:", err);
+        console.error("Error in catalog lambda:", err);
         return {
             statusCode: 500,
             headers: corsHeaders,
@@ -99,10 +98,9 @@ async function listCatalog(companyId, gameId) {
         };
     }
 
-    // Use GSI on gameid to fetch items
+    // Use gameid as partition key to fetch items
     const data = await docClient.send(new QueryCommand({
-        TableName: "gap_config_catalog",
-        IndexName: "gameidIndex2", // Assuming a GSI on gameid
+        TableName: "gap_catalog",
         KeyConditionExpression: "gameid = :gid",
         ExpressionAttributeValues: {
             ":gid": gameId
@@ -120,6 +118,8 @@ async function listCatalog(companyId, gameId) {
  * Create a new catalog item
  */
 async function createCatalogItem(companyId, gameIdFromPath, body) {
+    console.log("Create Item Body:", JSON.stringify(body));
+    
     const {
         category, itemid, assetId, bundle, currency, description,
         imageUrl, limitedAmount, maxTime, maxUses, name, payload,
@@ -149,17 +149,17 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
         };
     }
 
-    // Check for existing (category + itemid)
+    // Check for existing (gameid + itemid)
     const existing = await docClient.send(new GetCommand({
-        TableName: "gap_config_catalog",
-        Key: { category, itemid }
+        TableName: "gap_catalog",
+        Key: { gameid, itemid }
     }));
 
     if (existing.Item) {
         return {
             statusCode: 400,
             headers: corsHeaders,
-            body: JSON.stringify({ message: "Item ID already exists in this category" })
+            body: JSON.stringify({ message: "Item ID already exists in this game" })
         };
     }
 
@@ -186,7 +186,7 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
     };
 
     await docClient.send(new PutCommand({
-        TableName: "gap_config_catalog",
+        TableName: "gap_catalog",
         Item: catalogItem
     }));
 
@@ -200,10 +200,10 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
 /**
  * Update catalog item
  */
-async function updateCatalogItem(companyId, gameId, category, itemid, body) {
+async function updateCatalogItem(companyId, gameId, itemid, body) {
     const {
         assetId, bundle, currency, description, imageUrl, limitedAmount,
-        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase
+        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category
     } = body;
 
     // Verify game ownership
@@ -222,8 +222,8 @@ async function updateCatalogItem(companyId, gameId, category, itemid, body) {
 
     // Verify existence
     const existing = await docClient.send(new GetCommand({
-        TableName: "gap_config_catalog",
-        Key: { category, itemid }
+        TableName: "gap_catalog",
+        Key: { gameid: gameId, itemid }
     }));
 
     if (!existing.Item) {
@@ -240,7 +240,7 @@ async function updateCatalogItem(companyId, gameId, category, itemid, body) {
 
     const fields = {
         assetId, bundle, currency, description, imageUrl, limitedAmount,
-        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase
+        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category
     };
 
     for (const [key, value] of Object.entries(fields)) {
@@ -252,8 +252,8 @@ async function updateCatalogItem(companyId, gameId, category, itemid, body) {
     }
 
     await docClient.send(new UpdateCommand({
-        TableName: "gap_config_catalog",
-        Key: { category, itemid },
+        TableName: "gap_catalog",
+        Key: { gameid: gameId, itemid },
         UpdateExpression: updateExp,
         ExpressionAttributeNames: expNames,
         ExpressionAttributeValues: expValues
@@ -269,7 +269,7 @@ async function updateCatalogItem(companyId, gameId, category, itemid, body) {
 /**
  * Delete catalog item
  */
-async function deleteCatalogItem(companyId, gameId, category, itemid) {
+async function deleteCatalogItem(companyId, gameId, itemid) {
     // Verify game ownership
     const gameCheck = await docClient.send(new GetCommand({
         TableName: "gadash_games",
@@ -285,8 +285,8 @@ async function deleteCatalogItem(companyId, gameId, category, itemid) {
     }
 
     await docClient.send(new DeleteCommand({
-        TableName: "gap_config_catalog",
-        Key: { category, itemid }
+        TableName: "gap_catalog",
+        Key: { gameid: gameId, itemid }
     }));
 
     return {
@@ -295,3 +295,4 @@ async function deleteCatalogItem(companyId, gameId, category, itemid) {
         body: JSON.stringify({ message: "Catalog item deleted successfully" })
     };
 }
+

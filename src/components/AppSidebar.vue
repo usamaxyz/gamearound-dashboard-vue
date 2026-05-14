@@ -11,7 +11,9 @@ import {
   Gamepad2,
   Coins,
   Info,
-  LogOut
+  LogOut,
+  Package,
+  FileJson
 } from 'lucide-vue-next';
 
 export default {
@@ -26,7 +28,9 @@ export default {
     Gamepad2,
     Coins,
     Info,
-    LogOut
+    LogOut,
+    Package,
+    FileJson
   },
   props: {
     isOpen: Boolean,
@@ -69,15 +73,15 @@ export default {
           show: this.authStore.hasPermission('manage_currencies')
         },
         { 
-          name: 'Config Catalog', 
-          to: '/config-catalog', 
-          icon: 'Info',
-          show: this.authStore.hasPermission('manage_config_catalog')
+          name: 'Catalog', 
+          to: '/catalog', 
+          icon: 'Package',
+          show: this.authStore.hasPermission('manage_catalog')
         },
         { 
           name: 'JSON Templates', 
           to: '/json-templates', 
-          icon: 'Info', // Will use a proper icon like FileJson later, but reusing Info for now or maybe FileCode
+          icon: 'FileJson',
           show: this.authStore.hasPermission('manage_json_templates')
         },
         {

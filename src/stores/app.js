@@ -4,7 +4,7 @@ export const useAppStore = defineStore('app', {
     state: () => ({
         app_name: 'Gamearound',
         version: '1.0.4',
-        permissions: ['admin', 'manage_users', 'manage_games', 'manage_currencies'],
+        permissions: ['admin', 'manage_users', 'manage_games', 'manage_currencies', 'manage_catalog', 'manage_json_templates'],
     }),
 
     getters: {},

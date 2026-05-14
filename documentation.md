@@ -25,7 +25,7 @@ The Gamearound Dashboard is a multi-tenant administrative interface for managing
     - `manage_users`: Allows CRUD operations on users.
     - `manage_games`: Allows CRUD operations on games.
     - `manage_currencies`: Allows managing game virtual currencies.
-    - `manage_config_catalog`: Allows managing game configurations and items.
+    - `manage_catalog`: Allows managing game configurations and items.
     - `manage_json_templates`: Allows managing JSON structures/templates.
     - `admin`: Super-user permission required for sensitive operations (e.g., modifying other admins).
 
@@ -57,7 +57,7 @@ The dashboard is organized into the following functional areas:
 - **Features**: 
     - Register new games with unique identifiers.
     - Update game metadata.
-    - Games serve as the primary scope for Currencies and Config Catalog items.
+    - Games serve as the primary scope for Currencies and Catalog items.
 
 ### 3.4 Currencies
 - **Purpose**: Manage virtual economies within each game.
@@ -66,7 +66,7 @@ The dashboard is organized into the following functional areas:
     - Configure launch deposits (initial balance for new players).
     - Associate assets (icons/images) with currencies via S3 upload.
 
-### 3.5 Config Catalog
+### 3.5 Catalog
 - **Purpose**: The core configuration engine for game items and assets.
 - **Features**: 
     - Create and manage catalog items (items, bundles, etc.).
@@ -78,7 +78,7 @@ The dashboard is organized into the following functional areas:
 - **Purpose**: Reusable blueprints for complex configuration payloads.
 - **Features**: 
     - Define structured JSON schemas (attributes with types: string, number, object, array).
-    - Used by the Config Catalog to ensure consistency and prevent manual JSON entry errors.
+    - Used by the Catalog to ensure consistency and prevent manual JSON entry errors.
 
 ### 3.7 Asset Management (Media)
 - **Purpose**: Integrated file handling for game assets.
@@ -141,11 +141,10 @@ The system uses the following tables (all in `eu-central-1`):
 - **Partition Key**: `companyId` (String)
 - **Sort Key**: `templateId` (String)
 
-#### `gap_config_catalog` (game table)
-- **Partition Key**: `category` (String)
+#### `gap_catalog` (game table)
+- **Partition Key**: `gameid` (String)
 - **Sort Key**: `itemid` (String)
-- **GSI (`gameidIndex2`)**: Partition Key: `gameid`
-- **Attributes**: `assetId`, `bundle`, `currency`, `description`, `imageUrl`, `limitedAmount`, `maxTime`, `maxUses`, `name`, `payload`, `price`, `stackable`, `tradable`, `inAppPurchase`
+- **Attributes**: `assetId`, `bundle`, `category`, `currency`, `description`, `imageUrl`, `limitedAmount`, `maxTime`, `maxUses`, `name`, `payload`, `price`, `stackable`, `tradable`, `inAppPurchase`
 
 #### `gap_config_currency`  (game table)
 - **Partition Key**: `gameid` (String)
@@ -158,7 +157,7 @@ The system uses the following tables (all in `eu-central-1`):
 | `users` | CRUD for users, RBAC check, Cognito Admin ops | `gadash_users`, `gadash_companies`, `gadash_games` |
 | `games` | CRUD for games, ownership verification | `gadash_users`, `gadash_games` |
 | `currencies` | CRUD for game currencies | `gadash_users`, `gadash_games`, `gap_config_currency` |
-| `configCatalog` | CRUD for catalog items, game ownership check | `gadash_users`, `gadash_games`, `gap_config_catalog` |
+| `catalog` | CRUD for catalog items, game ownership check | `gadash_users`, `gadash_games`, `gap_catalog` |
 | `jsonTemplates`| CRUD for JSON templates | `gadash_users`, `gadash_json_templates` |
 | `assets` | Generates S3 presigned URLs for uploads | `gadash_games` |
 | `createCompany`| (One-time) company & admin user creation | `gadash_companies`, `gadash_users` |
@@ -182,10 +181,10 @@ All endpoints are relative to the **API Endpoint** URL.
 | | `POST` | `/currencies/{gameId}` | Create a new currency |
 | | `PATCH` | `/currencies/{gameId}/{currencyId}` | Update currency details |
 | | `DELETE` | `/currencies/{gameId}/{currencyId}` | Delete a currency |
-| **Config Catalog**| `GET` | `/config-catalog/{gameId}` | List catalog items for a game |
-| | `POST` | `/config-catalog/{gameId}` | Create a catalog item |
-| | `PATCH` | `/config-catalog/{gameId}/{category}/{itemId}` | Update catalog item |
-| | `DELETE` | `/config-catalog/{gameId}/{category}/{itemId}` | Delete catalog item |
+| **Catalog**| `GET` | `/catalog/{gameId}` | List catalog items for a game |
+| | `POST` | `/catalog/{gameId}` | Create a catalog item |
+| | `PATCH` | `/catalog/{gameId}/{itemId}` | Update catalog item |
+| | `DELETE` | `/catalog/{gameId}/{itemId}` | Delete catalog item |
 | **JSON Templates**| `GET` | `/json-templates` | List available JSON templates |
 | | `GET` | `/json-templates/{templateId}` | Get specific template details |
 | | `POST` | `/json-templates` | Create a new JSON template |

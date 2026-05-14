@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="header-content">
         <h1>JSON Templates</h1>
-        <p>Manage pre-defined JSON templates for Config Catalog bundles and payloads.</p>
+        <p>Manage pre-defined JSON templates for Catalog bundles and payloads.</p>
       </div>
       <router-link :to="{ name: 'json-templates-create' }" class="btn-primary">
          <Plus :size="20" />

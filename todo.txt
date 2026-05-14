@@ -104,3 +104,6 @@ Attributes are:
 for assetUrl and imageUrl, we need to allow admin to choose images and then upload them to S3 pucket and store their url.
 S3 bucket name: gamearound-platform
 upload path: /assets/{gameId}/UI/Currency/
+
+https://main.d2d3ydw8jtdnj7.amplifyapp.com/
+

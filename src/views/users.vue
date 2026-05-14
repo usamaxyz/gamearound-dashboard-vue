@@ -268,7 +268,7 @@ import { useAuthStore } from '@/stores/auth';
 import { 
   UserPlus, Users, ShieldCheck, UserCheck, Search, 
   RefreshCw, Edit2, Trash2, X, UserX, User, Mail,
-  Shield, Code, Headphones, Check, Layout
+  Shield, Code, Headphones, Check, Layout, Gamepad2, Coins, Package, FileJson
 } from 'lucide-vue-next';
 
 export default {
@@ -276,7 +276,7 @@ export default {
   components: {
     UserPlus, Users, ShieldCheck, UserCheck, Search, 
     RefreshCw, Edit2, Trash2, X, UserX, User, Mail,
-    Shield, Code, Headphones, Check, Layout
+    Shield, Code, Headphones, Check, Layout, Gamepad2, Coins, Package, FileJson
   },
   setup() {
     const appStore = useAppStore();
@@ -319,6 +319,9 @@ export default {
         case 'admin': return 'Shield';
         case 'manage_users': return 'Users';
         case 'manage_games': return 'Gamepad2';
+        case 'manage_currencies': return 'Coins';
+        case 'manage_catalog': return 'Package';
+        case 'manage_json_templates': return 'FileJson';
         default: return 'Layout';
       }
     },

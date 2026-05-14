@@ -2,7 +2,7 @@
   <div class="catalog-form-page fadeIn">
     <div class="page-header">
       <div class="header-content">
-        <button @click="$router.push({ name: 'config-catalog' })" class="btn-ghost mb-5" style="width: fit-content;">
+        <button @click="$router.push({ name: 'catalog' })" class="btn-ghost mb-5" style="width: fit-content;">
           <ChevronLeft :size="20" />
           <span>Back to Catalog</span>
         </button>
@@ -246,7 +246,7 @@
         </div>
 
         <div class="mt-4 d-flex justify-content-end gap-3">
-          <button type="button" @click="$router.push({ name: 'config-catalog' })" class="btn-secondary"
+          <button type="button" @click="$router.push({ name: 'catalog' })" class="btn-secondary"
             :disabled="formLoading">Cancel</button>
           <button @click="saveItem" class="btn-primary" :disabled="formLoading">
             <span v-if="!formLoading">{{ isEdit ? 'Save Changes' : 'Create Item' }}</span>
@@ -269,7 +269,7 @@ import {
 import JsonBuilder from '@/components/json-builder/JsonBuilder.vue';
 
 export default {
-  name: 'ConfigCatalogForm',
+  name: 'CatalogForm',
   components: {
     ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown, JsonBuilder
   },
@@ -368,17 +368,17 @@ export default {
       try {
         // Since list fetches all, we might find it in the list or fetch it specifically
         // For simplicity and correctness, fetch the game's catalog and find the item
-        const res = await api.get(`/config-catalog/${this.selectedGameId}`);
+        const res = await api.get(`/catalog/${this.selectedGameId}`);
         const targetItemId = this.$route.params.itemid || this.$route.query.duplicateFromItemId;
-        const targetCategory = this.$route.params.category || this.$route.query.duplicateFromCategory;
 
-        const item = res.data.items.find(i =>
-          i.itemid === targetItemId &&
-          i.category === targetCategory
-        );
+        const item = res.data.items.find(i => i.itemid === targetItemId);
 
         if (item) {
-          this.form = { ...item, imageFile: null, assetFile: null };
+          this.form = { 
+            ...item,
+            imageFile: null, 
+            assetFile: null 
+          };
           
           if (this.$route.query.duplicateFromItemId) {
             const randomSuffix = Math.floor(Math.random() * 100000);
@@ -389,7 +389,7 @@ export default {
           this.assetMode = 'link';
         } else {
           alert('Item not found');
-          this.$router.push({ name: 'config-catalog' });
+          this.$router.push({ name: 'catalog' });
         }
       } catch (err) {
         console.error('Failed to fetch item:', err);
@@ -454,9 +454,9 @@ export default {
         delete payload.assetFile;
 
         if (this.isEdit) {
-          await api.patch(`/config-catalog/${this.selectedGameId}/${this.form.category}/${this.form.itemid}`, payload);
+          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, payload);
         } else {
-          await api.post(`/config-catalog/${this.selectedGameId}`, payload);
+          await api.post(`/catalog/${this.selectedGameId}`, payload);
         }
         this.stepStatus.store = 'success';
       } catch (err) {
@@ -471,7 +471,7 @@ export default {
         this.stepStatus.image = 'loading';
         try {
           await this.performUpload(this.form.imageFile, 'imageUrl', 'catalog/images');
-          await api.patch(`/config-catalog/${this.selectedGameId}/${this.form.category}/${this.form.itemid}`, { imageUrl: this.form.imageUrl });
+          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, { imageUrl: this.form.imageUrl });
           this.stepStatus.image = 'success';
         } catch (err) {
           this.stepStatus.image = 'error';
@@ -485,7 +485,7 @@ export default {
         this.stepStatus.asset = 'loading';
         try {
           await this.performUpload(this.form.assetFile, 'assetId', 'catalog/assets');
-          await api.patch(`/config-catalog/${this.selectedGameId}/${this.form.category}/${this.form.itemid}`, { assetId: this.form.assetId });
+          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, { assetId: this.form.assetId });
           this.stepStatus.asset = 'success';
         } catch (err) {
           this.stepStatus.asset = 'error';
@@ -495,7 +495,7 @@ export default {
       }
 
       setTimeout(() => {
-        this.$router.push({ name: 'config-catalog' });
+        this.$router.push({ name: 'catalog' });
       }, 1000);
     }
   }
