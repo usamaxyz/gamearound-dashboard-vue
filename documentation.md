@@ -85,6 +85,7 @@ The dashboard is organized into the following functional areas:
 - **Features**: 
     - S3-backed storage with CloudFront distribution.
     - Presigned URL generation for secure, direct-to-S3 uploads from the browser.
+    - **CloudFront Integration**: All assets are served and stored in the database using the CloudFront domain (`https://du1ui0vdk1uj4.cloudfront.net`).
     - Automatic path organization: `/assets/{gameId}/{category}/{recordId}_{fileName}`.
 
 ---
@@ -159,9 +160,9 @@ The system uses the following tables (all in `eu-central-1`):
 | `currencies` | CRUD for game currencies | `gadash_users`, `gadash_games`, `gap_config_currency` |
 | `catalog` | CRUD for catalog items, game ownership check | `gadash_users`, `gadash_games`, `gap_catalog` |
 | `jsonTemplates`| CRUD for JSON templates | `gadash_users`, `gadash_json_templates` |
-| `assets` | Generates S3 presigned URLs for uploads | `gadash_games` |
+| `assets` | Generates S3 presigned URLs for uploads (Returns CloudFront URLs) | `gadash_games` |
 | `createCompany`| (One-time) company & admin user creation | `gadash_companies`, `gadash_users` |
-| `fixes` | One-off data migration and fix scripts (run manually) | Various |
+| `fixes` | Data migration and fix scripts (e.g., `migrate_to_cloudfront.js`) | Various |
 
 ### 4.6 API Endpoints
 All endpoints are relative to the **API Endpoint** URL.

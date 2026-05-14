@@ -16,6 +16,8 @@ const corsHeaders = {
 
 const BUCKET_NAME = "gamearound-platform";
 
+const CLOUDFRONT_URL = "https://du1ui0vdk1uj4.cloudfront.net";
+
 export const handler = async (event) => {
     console.log("Assets Event:", JSON.stringify(event, null, 2));
 
@@ -71,7 +73,7 @@ export const handler = async (event) => {
             });
 
             const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-            const finalUrl = `https://${BUCKET_NAME}.s3.${region}.amazonaws.com/${s3Key}`;
+            const finalUrl = `${CLOUDFRONT_URL}/${s3Key}`;
 
             return {
                 statusCode: 200,
