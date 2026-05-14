@@ -22,7 +22,7 @@
   </div>
 
   <div v-else class="auth-shell">
-    <RouterView />
+    <RouterView v-if="!$route.meta.auth" />
   </div>
 </template>
 

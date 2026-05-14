@@ -12,18 +12,33 @@ const api = axios.create({
 api.interceptors.request.use(async (config) => {
     const authStore = useAuthStore();
     
-    // Ensure we have a fresh session if possible
-    if (!authStore.isAuthenticated) {
-        await authStore.checkAuth();
-    }
-
-    const token = authStore.token;
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+    // Only attach token if authenticated. 
+    // If not authenticated, we don't send the Authorization header, 
+    // and the request will fail naturally or be caught by guards.
+    if (authStore.isAuthenticated) {
+        const token = authStore.token;
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
     }
     
     return config;
 }, (error) => {
+    return Promise.reject(error);
+});
+
+// Interceptor to handle 401 Unauthorized responses
+api.interceptors.response.use((response) => {
+    return response;
+}, async (error) => {
+    const authStore = useAuthStore();
+    
+    if (error.response && error.response.status === 401) {
+        // If we get a 401, it means the session is invalid or expired
+        console.warn('Unauthorized request, logging out...');
+        await authStore.logout();
+    }
+    
     return Promise.reject(error);
 });
 

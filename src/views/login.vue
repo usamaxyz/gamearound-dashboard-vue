@@ -26,7 +26,12 @@
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
+          <div class="label-row">
+            <label for="password">Password</label>
+            <router-link :to="{ name: 'forgot-password' }" class="forgot-link">
+              Forgot Password?
+            </router-link>
+          </div>
           <div class="input-wrapper has-icon">
             <Lock class="input-icon" :size="20" />
             <input 
