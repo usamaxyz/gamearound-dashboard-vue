@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '@/stores/auth';
 
 const api = axios.create({
-    baseURL: 'https://4wk6506a85.execute-api.eu-central-1.amazonaws.com/staging',
+    baseURL: 'https://gfuiuxg5me.execute-api.eu-central-1.amazonaws.com/stage',
     headers: {
         'Content-Type': 'application/json'
     }
