@@ -64,6 +64,32 @@
       margin: 0;
     }
     p { color: var(--text-muted); margin: var(--space-1) 0 0; }
+
+    // Title with the round "i" button beside it
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .help-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+
+      &:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+    }
   }
 }
 

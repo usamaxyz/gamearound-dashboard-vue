@@ -6,7 +6,13 @@
           <ChevronLeft :size="20" />
           <span>Back to Catalog</span>
         </button>
-        <h1>{{ isEdit ? 'Edit Item' : 'Add New Item' }}</h1>
+        <div class="title-row">
+          <h1>{{ isEdit ? 'Edit Item' : 'Add New Item' }}</h1>
+          <button type="button" class="help-toggle" @click="showHelp = !showHelp"
+            title="How the price and reward fields work">
+            <Info :size="18" />
+          </button>
+        </div>
         <p>Game: <strong>{{ selectedGame?.name }}</strong></p>
       </div>
     </div>
@@ -19,8 +25,24 @@
 
     <div v-else class="w-form py-form">
       <div class="card bg-surface border rounded-lg p-form">
+        <div v-if="showHelp" class="help-card fadeIn">
+          <h4>How the price and the reward work together</h4>
+          <ul>
+            <li><strong>Price</strong> is what the player pays. When <strong>In-App Purchase</strong> is on, the player
+              pays real money and the server picks the real currency. When it is off, the player pays
+              <strong>Price</strong> coins out of the <strong>Price Wallet</strong>.</li>
+            <li><strong>Reward</strong> is what the player gets. The player receives <strong>Quantity</strong> pieces
+              of the item. When the category is <strong>Currency</strong>, the player receives
+              <strong>Quantity</strong> coins in the <strong>Reward Wallet</strong> instead.</li>
+            <li>Keep the two wallets different. When the player pays and receives in one wallet, the player gains free
+              coins on every purchase.</li>
+          </ul>
+        </div>
+
         <div class="form-grid gap-lg">
-          <!-- Row 1: Item ID & Category -->
+          <!-- Section 1: Basics -->
+          <h3 class="section-title span-2">Basics</h3>
+
           <div class="form-group">
             <label>Item ID *</label>
             <div class="input-wrapper">
@@ -34,10 +56,10 @@
             <div class="input-wrapper">
               <input v-model="form.category" type="text" :disabled="isEdit" required />
             </div>
-            <p class="input-hint">Partition key for the catalog.</p>
+            <p class="input-hint">Type <strong>Currency</strong> when this item gives coins. Any other word makes it a
+              normal item.</p>
           </div>
 
-          <!-- Row 2: Name & Description -->
           <div class="form-group span-2">
             <label>Name *</label>
             <div class="input-wrapper">
@@ -52,28 +74,74 @@
             </div>
           </div>
 
-          <!-- Row 3: Pricing & Currency -->
-          <div class="form-group">
-            <label>Price</label>
-            <div class="input-wrapper">
-              <input v-model.number="form.price" type="number" placeholder="0" />
+          <!-- Section 2: Price (what the player pays) -->
+          <h3 class="section-title span-2">Price (what the player pays)</h3>
+
+          <div class="span-2">
+            <div class="pill-selection-grid">
+              <div class="selection-pill" :class="{ 'active': form.inAppPurchase === 'true' }" @click="form.inAppPurchase = form.inAppPurchase === 'true' ? 'false' : 'true'">
+                <span>In-App Purchase (real money)</span>
+              </div>
             </div>
           </div>
 
           <div class="form-group">
-            <label>Currency</label>
+            <label>Price Wallet</label>
             <div class="custom-select-wrapper">
               <select v-model="form.currency">
-                <option value="">Select Currency</option>
+                <option value="">Select Wallet</option>
                 <option v-for="curr in currencies" :key="curr.id" :value="curr.id">
                   {{ curr.name }}
                 </option>
               </select>
               <ChevronDown class="select-icon" :size="16" />
             </div>
+            <p class="input-hint">The wallet the player pays from. Leave it empty when In-App Purchase is on.</p>
           </div>
 
-          <!-- Row 4: Limits -->
+          <div class="form-group">
+            <label>Price</label>
+            <div class="input-wrapper">
+              <input v-model.number="form.price" type="number" placeholder="0" />
+            </div>
+            <p class="input-hint">Real money when In-App Purchase is on. Coins when it is off. Set 0 for a free item.
+            </p>
+          </div>
+
+          <!-- Section 3: Reward (what the player gets) -->
+          <h3 class="section-title span-2">Reward (what the player gets)</h3>
+
+          <div class="form-group">
+            <label>Reward Wallet</label>
+            <div class="custom-select-wrapper">
+              <select v-model="form.rewardCurrency">
+                <option value="">Select Wallet</option>
+                <option v-for="curr in currencies" :key="curr.id" :value="curr.id">
+                  {{ curr.name }}
+                </option>
+              </select>
+              <ChevronDown class="select-icon" :size="16" />
+            </div>
+            <p class="input-hint">The wallet that receives the coins. Used when the category is Currency.</p>
+          </div>
+
+          <div class="form-group">
+            <label>Quantity</label>
+            <div class="input-wrapper">
+              <input v-model.number="form.maxUses" type="number" placeholder="0" />
+            </div>
+            <p class="input-hint">How many pieces of the item the player gets. When the category is Currency, this is
+              how many coins the Reward Wallet receives.</p>
+          </div>
+
+          <p v-if="sameWalletWarning" class="warning-hint span-2">
+            The Price Wallet and the Reward Wallet are the same, so the player pays and receives in one wallet and gains
+            free coins. Please pick two different wallets.
+          </p>
+
+          <!-- Section 4: Limits -->
+          <h3 class="section-title span-2">Limits</h3>
+
           <div class="form-group">
             <label>Limited Amount</label>
             <div class="input-wrapper">
@@ -83,20 +151,15 @@
           </div>
 
           <div class="form-group">
-            <label>Max Uses</label>
-            <div class="input-wrapper">
-              <input v-model.number="form.maxUses" type="number" placeholder="0" />
-            </div>
-          </div>
-
-          <div class="form-group">
             <label>Max Time (seconds)</label>
             <div class="input-wrapper">
               <input v-model.number="form.maxTime" type="number" placeholder="0" />
             </div>
           </div>
 
-          <!-- Row 5: Toggles -->
+          <!-- Section 5: Trading -->
+          <h3 class="section-title span-2">Trading</h3>
+
           <div class="span-2">
             <div class="pill-selection-grid">
               <div class="selection-pill" :class="{ 'active': form.stackable === 'true' }" @click="form.stackable = form.stackable === 'true' ? 'false' : 'true'">
@@ -105,15 +168,10 @@
               <div class="selection-pill" :class="{ 'active': form.tradable === 'true' }" @click="form.tradable = form.tradable === 'true' ? 'false' : 'true'">
                 <span>Tradable</span>
               </div>
-              <div class="selection-pill" :class="{ 'active': form.inAppPurchase === 'true' }" @click="form.inAppPurchase = form.inAppPurchase === 'true' ? 'false' : 'true'">
-                <span>In-App Purchase</span>
-              </div>
             </div>
           </div>
 
-          <hr class="span-2" />
-
-          <!-- Row 6: Assets -->
+          <!-- Section 6: Assets -->
           <div class="form-group">
             <label>Image Asset</label>
             <div class="radio-group">
@@ -190,9 +248,9 @@
             </div>
           </div>
 
-          <hr class="span-2" />
+          <!-- Section 7: Advanced data -->
+          <h3 class="section-title span-2">Advanced data</h3>
 
-          <!-- Row 7: JSON Fields -->
           <div class="form-group span-2">
             <JsonBuilder
               v-model="form.bundle"
@@ -264,14 +322,14 @@ import axios from 'axios';
 import { useGamesStore } from '@/stores/games';
 import { storeToRefs } from 'pinia';
 import {
-  ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown
+  ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown, Info
 } from 'lucide-vue-next';
 import JsonBuilder from '@/components/json-builder/JsonBuilder.vue';
 
 export default {
   name: 'CatalogForm',
   components: {
-    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown, JsonBuilder
+    ChevronLeft, RefreshCw, Upload, X, CheckCircle2, Circle, Gamepad2, FileCode, ChevronDown, Info, JsonBuilder
   },
   setup() {
     const gamesStore = useGamesStore();
@@ -284,6 +342,7 @@ export default {
       isEdit: false,
       imageMode: 'upload',
       assetMode: 'upload',
+      showHelp: false,
       showProgress: false,
       stepStatus: {
         store: 'pending',
@@ -299,6 +358,7 @@ export default {
         description: '',
         price: 0,
         currency: '',
+        rewardCurrency: '',
         limitedAmount: -1,
         maxUses: 0,
         maxTime: 0,
@@ -313,6 +373,12 @@ export default {
         assetFile: null
       }
     };
+  },
+  computed: {
+    // Paying and rewarding in one wallet gives the player free coins on every purchase.
+    sameWalletWarning() {
+      return !!this.form.currency && (this.form.currency === this.form.rewardCurrency);
+    }
   },
   async mounted() {
     const gamesStore = useGamesStore();
@@ -374,10 +440,14 @@ export default {
         const item = res.data.items.find(i => i.itemid === targetItemId);
 
         if (item) {
-          this.form = { 
+          // We copy the defaults first, then the item on top. An old item saved before the
+          // reward field existed then gets an empty rewardCurrency instead of undefined.
+          this.form = {
+            ...this.form,
             ...item,
-            imageFile: null, 
-            assetFile: null 
+            rewardCurrency: item.rewardCurrency || '',
+            imageFile: null,
+            assetFile: null
           };
           
           if (this.$route.query.duplicateFromItemId) {

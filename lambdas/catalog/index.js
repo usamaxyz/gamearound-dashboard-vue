@@ -123,7 +123,10 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
     const {
         category, itemid, assetId, bundle, currency, description,
         imageUrl, limitedAmount, maxTime, maxUses, name, payload,
-        price, stackable, tradable, inAppPurchase
+        price, stackable, tradable, inAppPurchase,
+        // currency = the wallet the player pays from. rewardCurrency = the wallet that receives
+        // the coins. They are separate so one field can never be both.
+        rewardCurrency
     } = body;
     const gameid = gameIdFromPath;
 
@@ -170,6 +173,7 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
         assetId: assetId || "",
         bundle: bundle !== undefined ? bundle : "",
         currency: currency || "",
+        rewardCurrency: rewardCurrency || "",
         description: description || "",
         imageUrl: imageUrl || "",
         limitedAmount: limitedAmount !== undefined ? Number(limitedAmount) : -1,
@@ -203,7 +207,8 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
 async function updateCatalogItem(companyId, gameId, itemid, body) {
     const {
         assetId, bundle, currency, description, imageUrl, limitedAmount,
-        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category
+        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category,
+        rewardCurrency
     } = body;
 
     // Verify game ownership
@@ -240,14 +245,17 @@ async function updateCatalogItem(companyId, gameId, itemid, body) {
 
     const fields = {
         assetId, bundle, currency, description, imageUrl, limitedAmount,
-        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category
+        maxTime, maxUses, name, payload, price, stackable, tradable, inAppPurchase, category,
+        rewardCurrency
     };
+
+    const numericFields = ['price', 'limitedAmount', 'maxTime', 'maxUses'];
 
     for (const [key, value] of Object.entries(fields)) {
         if (value !== undefined) {
             updateExp += `, #${key} = :${key}`;
             expNames[`#${key}`] = key;
-            expValues[`:${key}`] = (key === 'price' || key === 'limitedAmount' || key === 'maxTime' || key === 'maxUses') ? Number(value) : String(value);
+            expValues[`:${key}`] = numericFields.includes(key) ? Number(value) : String(value);
         }
     }
 

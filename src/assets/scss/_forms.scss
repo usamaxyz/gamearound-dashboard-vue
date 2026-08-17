@@ -431,3 +431,63 @@
 .dashed {
   border-style: dashed !important;
 }
+
+// Group header inside a .form-grid, so long forms read as sections
+.section-title {
+  margin: var(--space-4) 0 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.form-grid > .section-title:first-child {
+  margin-top: 0;
+}
+
+// Short help panel opened by the "i" button in the page header
+.help-card {
+  margin-bottom: var(--space-6);
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: rgba(56, 189, 248, 0.06);
+
+  h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-main);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  li {
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Warning shown under a group of fields when the values do not fit together
+.warning-hint {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--warning);
+  border-radius: var(--radius-md);
+  background: rgba(245, 158, 11, 0.08);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--text-main);
+}
