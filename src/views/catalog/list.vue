@@ -36,6 +36,7 @@
               <th>Item</th>
               <th>Category</th>
               <th>Price</th>
+              <th>Reward</th>
               <th>Assets</th>
               <th style="text-align: right">Actions</th>
             </tr>
@@ -54,7 +55,16 @@
               <td>
                 <div class="d-flex flex-column">
                   <span class="text-mono">{{ item.price || 0 }}</span>
-                  <span class="fs-sm text-muted-util">{{ item.currency }}</span>
+                  <span class="fs-sm text-muted-util">
+                    {{ item.inAppPurchase === 'true' ? 'In-App Purchase' : item.currency }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-column">
+                  <span class="text-mono">{{ item.maxUses || 0 }}</span>
+                  <span v-if="isMissingRewardWallet(item)" class="fs-sm text-warning-util">not set</span>
+                  <span v-else class="fs-sm text-muted-util">{{ item.rewardCurrency }}</span>
                 </div>
               </td>
               <td>
@@ -199,6 +209,10 @@ export default {
   methods: {
     getCloudFrontUrl,
     isImageFile,
+    // A coin pack pays nothing until somebody picks its reward wallet in the form.
+    isMissingRewardWallet(item) {
+      return (item.category === 'Currency') && !item.rewardCurrency;
+    },
     async fetchCatalog() {
       if (!this.selectedGameId) return;
       this.loading = true;
