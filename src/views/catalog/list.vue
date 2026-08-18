@@ -63,7 +63,7 @@
               <td>
                 <div class="d-flex flex-column">
                   <span class="text-mono">{{ item.maxUses || 0 }}</span>
-                  <span v-if="isMissingRewardWallet(item)" class="fs-sm text-warning-util">not set</span>
+                  <span v-if="isMissingRewardWallet(item)" class="fs-sm text-warning-util">no wallet</span>
                   <span v-else class="fs-sm text-muted-util">{{ item.rewardCurrency }}</span>
                 </div>
               </td>
