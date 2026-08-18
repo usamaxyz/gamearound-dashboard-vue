@@ -36,7 +36,7 @@
               <th>Item</th>
               <th>Category</th>
               <th>Price</th>
-              <th>Reward</th>
+              <th>Quantity</th>
               <th>Assets</th>
               <th style="text-align: right">Actions</th>
             </tr>
