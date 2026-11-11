@@ -11,6 +11,24 @@ const corsHeaders = {
     "Access-Control-Allow-Methods": "OPTIONS,GET,POST,PATCH,DELETE"
 };
 
+// A new Item ID may hold only English letters, digits, "-" and "_".
+// The ID goes into web addresses, S3 file names and the game client,
+// so a space or any other sign would break one of them.
+// Keep this rule the same as ITEM_ID_PATTERN in src/views/catalog/form.vue.
+const ITEM_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+
+// API Gateway (REST) gives path parameters to the lambda still encoded,
+// so "Brass Belle" arrives as "Brass%20Belle". Decode them before use.
+// Returns null when the value is not valid encoding (for example a lone "%").
+function decodePathParam(value) {
+    if (value === undefined || value === null) return value;
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return null;
+    }
+}
+
 export const handler = async (event) => {
     console.log("Catalog Event:", JSON.stringify(event, null, 2));
 
@@ -44,8 +62,16 @@ export const handler = async (event) => {
 
         const method = event.httpMethod;
         const resource = event.resource;
-        const gameIdParam = event.pathParameters?.gameId;
-        const itemIdParam = event.pathParameters?.itemId;
+        const gameIdParam = decodePathParam(event.pathParameters?.gameId);
+        const itemIdParam = decodePathParam(event.pathParameters?.itemId);
+
+        if (gameIdParam === null || itemIdParam === null) {
+            return {
+                statusCode: 400,
+                headers: corsHeaders,
+                body: JSON.stringify({ message: "Invalid Game ID or Item ID in the address" })
+            };
+        }
 
         // 2. Routing
         if (method === "GET" && resource === "/catalog/{gameId}" && gameIdParam) {
@@ -135,6 +161,14 @@ async function createCatalogItem(companyId, gameIdFromPath, body) {
             statusCode: 400,
             headers: corsHeaders,
             body: JSON.stringify({ message: "Game ID, Category, Item ID, and Name are required" })
+        };
+    }
+
+    if (typeof itemid !== "string" || !ITEM_ID_PATTERN.test(itemid)) {
+        return {
+            statusCode: 400,
+            headers: corsHeaders,
+            body: JSON.stringify({ message: "Item ID may contain only English letters, digits, \"-\" and \"_\", with no spaces" })
         };
     }
 
@@ -292,10 +326,24 @@ async function deleteCatalogItem(companyId, gameId, itemid) {
         };
     }
 
-    await docClient.send(new DeleteCommand({
-        TableName: "gap_catalog",
-        Key: { gameid: gameId, itemid }
-    }));
+    // DynamoDB reports success even when no row has the key, so ask
+    // DynamoDB to fail when the row is missing and report a 404.
+    try {
+        await docClient.send(new DeleteCommand({
+            TableName: "gap_catalog",
+            Key: { gameid: gameId, itemid },
+            ConditionExpression: "attribute_exists(itemid)"
+        }));
+    } catch (err) {
+        if (err.name === "ConditionalCheckFailedException") {
+            return {
+                statusCode: 404,
+                headers: corsHeaders,
+                body: JSON.stringify({ message: "Item not found" })
+            };
+        }
+        throw err;
+    }
 
     return {
         statusCode: 200,

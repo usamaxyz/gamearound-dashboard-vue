@@ -48,7 +48,8 @@
             <div class="input-wrapper">
               <input v-model="form.itemid" type="text" :disabled="isEdit" required />
             </div>
-            <p class="input-hint">Unique identifier for the item.</p>
+            <p v-if="itemIdError" class="input-hint is-error">{{ itemIdError }}</p>
+            <p v-else class="input-hint">Unique identifier for the item. Use only English letters, digits, "-" and "_", with no spaces.</p>
           </div>
 
           <div class="form-group">
@@ -195,7 +196,7 @@
               </div>
               <div class="upload-controls">
                 <template v-if="imageMode === 'upload'">
-                  <button type="button" class="btn btn-secondary btn-sm" :disabled="!form.itemid"
+                  <button type="button" class="btn btn-secondary btn-sm" :disabled="!form.itemid || !!itemIdError"
                     @click="$refs.imageInput.click()">
                     <Upload :size="16" />
                     <span>{{ form.imageFile ? 'Change Image' : 'Choose Image' }}</span>
@@ -206,7 +207,7 @@
                   <input v-model="form.imageUrl" type="text" placeholder="Enter Image URL" />
                 </div>
               </div>
-              <p v-if="imageMode === 'upload' && !form.itemid" class="input-hint">Please enter an Item ID first.</p>
+              <p v-if="imageMode === 'upload' && (!form.itemid || itemIdError)" class="input-hint">Please enter a valid Item ID first.</p>
             </div>
           </div>
 
@@ -233,7 +234,7 @@
               </div>
               <div class="upload-controls">
                 <template v-if="assetMode === 'upload'">
-                  <button type="button" class="btn btn-secondary btn-sm" :disabled="!form.itemid"
+                  <button type="button" class="btn btn-secondary btn-sm" :disabled="!form.itemid || !!itemIdError"
                     @click="$refs.assetInput.click()">
                     <Upload :size="16" />
                     <span>{{ form.assetFile ? 'Change Asset' : 'Choose Asset' }}</span>
@@ -244,7 +245,7 @@
                   <input v-model="form.assetId" type="text" placeholder="Enter Asset URL" />
                 </div>
               </div>
-              <p v-if="assetMode === 'upload' && !form.itemid" class="input-hint">Please enter an Item ID first.</p>
+              <p v-if="assetMode === 'upload' && (!form.itemid || itemIdError)" class="input-hint">Please enter a valid Item ID first.</p>
             </div>
           </div>
 
@@ -326,6 +327,10 @@ import {
 } from 'lucide-vue-next';
 import JsonBuilder from '@/components/json-builder/JsonBuilder.vue';
 
+// A new Item ID may hold only English letters, digits, "-" and "_".
+// Keep this rule the same as ITEM_ID_PATTERN in lambdas/catalog/index.js.
+const ITEM_ID_PATTERN = /^[A-Za-z0-9_-]+$/;
+
 export default {
   name: 'CatalogForm',
   components: {
@@ -375,6 +380,20 @@ export default {
     };
   },
   computed: {
+    // Old items may still have an ID with a space, so the rule is checked only
+    // when a new item is created. Editing an old item keeps working.
+    itemIdError() {
+      if (this.isEdit || !this.form.itemid) return '';
+      if (!ITEM_ID_PATTERN.test(this.form.itemid)) {
+        return 'Item ID may contain only English letters, digits, "-" and "_", with no spaces.';
+      }
+      return '';
+    },
+    // The ID is encoded so that any old ID with a space or other sign still
+    // reaches the right item.
+    itemApiPath() {
+      return `/catalog/${encodeURIComponent(this.selectedGameId)}/${encodeURIComponent(this.form.itemid)}`;
+    },
     // Paying and rewarding in one wallet gives the player free coins on every purchase.
     sameWalletWarning() {
       return !!this.form.currency && (this.form.currency === this.form.rewardCurrency);
@@ -512,6 +531,10 @@ export default {
         alert('Item ID, Category, and Name are required');
         return;
       }
+      if (this.itemIdError) {
+        alert(this.itemIdError);
+        return;
+      }
 
       this.formLoading = true;
       this.showProgress = true;
@@ -524,7 +547,7 @@ export default {
         delete payload.assetFile;
 
         if (this.isEdit) {
-          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, payload);
+          await api.patch(this.itemApiPath, payload);
         } else {
           await api.post(`/catalog/${this.selectedGameId}`, payload);
         }
@@ -541,9 +564,12 @@ export default {
         this.stepStatus.image = 'loading';
         try {
           await this.performUpload(this.form.imageFile, 'imageUrl', 'catalog/images');
-          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, { imageUrl: this.form.imageUrl });
+          await api.patch(this.itemApiPath, { imageUrl: this.form.imageUrl });
+          // The file is stored now, so a retry must not upload the file again.
+          this.form.imageFile = null;
           this.stepStatus.image = 'success';
         } catch (err) {
+          console.error('Image upload failed:', err);
           this.stepStatus.image = 'error';
         }
       } else {
@@ -555,13 +581,30 @@ export default {
         this.stepStatus.asset = 'loading';
         try {
           await this.performUpload(this.form.assetFile, 'assetId', 'catalog/assets');
-          await api.patch(`/catalog/${this.selectedGameId}/${this.form.itemid}`, { assetId: this.form.assetId });
+          await api.patch(this.itemApiPath, { assetId: this.form.assetId });
+          // The file is stored now, so a retry must not upload the file again.
+          this.form.assetFile = null;
           this.stepStatus.asset = 'success';
         } catch (err) {
+          console.error('Asset upload failed:', err);
           this.stepStatus.asset = 'error';
         }
       } else {
         this.stepStatus.asset = 'success';
+      }
+
+      // When the image or the asset failed, stay on the form and say so,
+      // so the item is not left without its files by mistake.
+      const failedSteps = [];
+      if (this.stepStatus.image === 'error') failedSteps.push('image');
+      if (this.stepStatus.asset === 'error') failedSteps.push('asset');
+      if (failedSteps.length > 0) {
+        // The item itself is already saved, so the next save must update the
+        // item instead of creating the item again.
+        this.isEdit = true;
+        this.formLoading = false;
+        alert(`The item was saved, but the ${failedSteps.join(' and ')} upload failed. Please press Save Changes to try again.`);
+        return;
       }
 
       setTimeout(() => {

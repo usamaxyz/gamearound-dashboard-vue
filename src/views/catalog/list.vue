@@ -235,14 +235,18 @@ export default {
       if (!this.itemToDelete) return;
       this.formLoading = true;
       try {
-        await api.delete(`/catalog/${this.selectedGameId}/${this.itemToDelete.itemid}`);
-        await this.fetchCatalog();
-        this.itemToDelete = null;
+        // The ID is encoded so that any old ID with a space or other sign still
+        // reaches the right item.
+        await api.delete(`/catalog/${encodeURIComponent(this.selectedGameId)}/${encodeURIComponent(this.itemToDelete.itemid)}`);
       } catch (err) {
         console.error('Failed to delete item:', err);
         alert(err.response?.data?.message || 'Error deleting item');
       } finally {
+        // Close the delete window and reload the list after success and after
+        // an error, so the list always shows what is really in the catalog.
+        this.itemToDelete = null;
         this.formLoading = false;
+        await this.fetchCatalog();
       }
     },
     previewAsset(item, type) {

@@ -87,6 +87,10 @@
   font-size: 0.75rem;
   color: var(--text-dim);
   margin-top: 0.5rem;
+
+  &.is-error {
+    color: var(--danger);
+  }
 }
 
 // Custom Pill Selection (from Users view)
